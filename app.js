@@ -62,15 +62,11 @@ app.post('/signupSubmit', async (req, res) => {
         name: joi.string().required(),
         email: joi.string().email().required(),
         password: joi.string().required(),
-        type: joi.string().required(),
-        wishlist: joi.array().required(),
-        favourites: joi.array().required(),
-        history: joi.array().required(),
         dob: joi.string().required()
     })
     try {
-        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password })
-        const { name, email, password, dob } = req.body;
+        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password, username: req.body.username, dob: req.body.dob })
+        const { username, name, email, password, dob } = req.body;
         const result = await userModel.find({
             email: email
         })
@@ -78,6 +74,7 @@ app.post('/signupSubmit', async (req, res) => {
             res.render('signupSubmit.ejs', { error: 'already exists' })
         } else {
             const user = new userModel({
+                username: username,
                 name: name,
                 email: email,
                 password: bcrypt.hashSync(password, 12),
