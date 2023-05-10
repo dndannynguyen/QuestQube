@@ -49,4 +49,8 @@ app.get('/', (req, res) => {
 
 })
 
+app.get('/profile', (req, res) => {
+    res.render('profile')
+})
+
 module.exports = app
