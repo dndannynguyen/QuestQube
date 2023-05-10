@@ -49,6 +49,40 @@ app.get('/', (req, res) => {
 
 })
 
+
+
+// LOGIN PAGE
+app.get('/login', (req, res) => {
+    res.render('login.ejs')
+})
+
+// LOGIN SUBMIT PAGE
+app.post('/loginSubmit', async (req, res) => {
+    const schema = Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().required()
+    })
+    try {
+        const validation = await schema.validateAsync({ email: req.body.email, password: req.body.password })
+        const result = await userModel.find({
+            email: req.body.email
+        })
+        if (result.length == 0) {
+            res.render('loginSubmit.ejs')
+        } else if (bcrypt.compareSync(req.body.password, result[0].password)) {
+            req.session.GLOBAL_AUTHENTICATION = true
+            req.session.name = result[0].name
+            req.session.type = result[0].type
+            req.session.cookie.maxAge = expireTime
+            res.redirect('/members')
+        } else {
+            res.render('loginSubmit.ejs')
+        }
+    } catch (error) {
+        res.redirect('/login')
+    }
+})
+
 app.get('/profile', (req, res) => {
     res.render('profile', { stylesheetPath: '/path/to/stylesheet.css' })
 })
