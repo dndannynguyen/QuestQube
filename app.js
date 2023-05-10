@@ -50,7 +50,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-    res.render('profile')
+    res.render('profile', { stylesheetPath: '/path/to/stylesheet.css' })
 })
 
 module.exports = app
