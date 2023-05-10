@@ -50,6 +50,45 @@ app.get('/', (req, res) => {
 })
 
 
+// SIGN UP PAGE
+app.get('/signup', (req,res) => {
+    res.render('signup.ejs')
+});
+
+// SIGN UP SUBMIT PAGE
+app.post('/signupSubmit', async (req, res) => {
+    const schema = Joi.object({
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        password: Joi.string().required()
+    })
+    try {
+        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password })
+        const { name, email, password } = req.body;
+        const result = await userModel.find({
+            email: email
+        })
+        if (result.length > 0) {
+            res.render('signupSubmit.ejs', { error: 'already exists' })
+        } else {
+            const user = new userModel({
+                name: name,
+                email: email,
+                password: bcrypt.hashSync(password, 12),
+                type: 'user'
+            })
+            await user.save()
+            req.session.GLOBAL_AUTHENTICATION = true
+            req.session.name = name
+            req.session.type = 'user'
+            req.session.cookie.maxAge = expireTime
+            res.redirect('/members')
+        }
+    } catch (error) {
+        res.render('signupSubmit.ejs', { error: 'invalid', name: req.body.name, email: req.body.email, password: req.body.password })
+    }
+})
+
 
 // LOGIN PAGE
 app.get('/login', (req, res) => {
