@@ -52,19 +52,25 @@ app.get('/', (req, res) => {
 
 // SIGN UP PAGE
 app.get('/signup', (req,res) => {
-    res.render('signup.ejs')
+    res.render('signup', { stylesheetPath: './styles/login.css' })
 });
 
 // SIGN UP SUBMIT PAGE
 app.post('/signupSubmit', async (req, res) => {
-    const schema = Joi.object({
-        name: Joi.string().required(),
-        email: Joi.string().email().required(),
-        password: Joi.string().required()
+    const schema = joi.object({
+        username: joi.string().required(),
+        name: joi.string().required(),
+        email: joi.string().email().required(),
+        password: joi.string().required(),
+        type: joi.string().required(),
+        wishlist: joi.array().required(),
+        favourites: joi.array().required(),
+        history: joi.array().required(),
+        dob: joi.string().required()
     })
     try {
         const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password })
-        const { name, email, password } = req.body;
+        const { name, email, password, dob } = req.body;
         const result = await userModel.find({
             email: email
         })
@@ -75,14 +81,18 @@ app.post('/signupSubmit', async (req, res) => {
                 name: name,
                 email: email,
                 password: bcrypt.hashSync(password, 12),
-                type: 'user'
+                type: 'user',
+                wishlist: [],
+                favourites: [],
+                history: [],
+                dob: dob
             })
             await user.save()
             req.session.GLOBAL_AUTHENTICATION = true
             req.session.name = name
             req.session.type = 'user'
             req.session.cookie.maxAge = expireTime
-            res.redirect('/members')
+            res.redirect('/profile')
         }
     } catch (error) {
         res.render('signupSubmit.ejs', { error: 'invalid', name: req.body.name, email: req.body.email, password: req.body.password })
@@ -92,14 +102,14 @@ app.post('/signupSubmit', async (req, res) => {
 
 // LOGIN PAGE
 app.get('/login', (req, res) => {
-    res.render('login.ejs')
+    res.render('login', { stylesheetPath: '/path/to/stylesheet.css' })
 })
 
 // LOGIN SUBMIT PAGE
 app.post('/loginSubmit', async (req, res) => {
-    const schema = Joi.object({
-        email: Joi.string().email().required(),
-        password: Joi.string().required()
+    const schema = joi.object({
+        email: joi.string().email().required(),
+        password: joi.string().required()
     })
     try {
         const validation = await schema.validateAsync({ email: req.body.email, password: req.body.password })
@@ -113,7 +123,7 @@ app.post('/loginSubmit', async (req, res) => {
             req.session.name = result[0].name
             req.session.type = result[0].type
             req.session.cookie.maxAge = expireTime
-            res.redirect('/members')
+            res.redirect('/profile')
         } else {
             res.render('loginSubmit.ejs')
         }
