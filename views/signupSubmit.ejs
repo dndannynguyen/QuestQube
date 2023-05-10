@@ -1,0 +1,15 @@
+<%- include("templates/head") %>
+
+<div class="container">
+    <% if (error == 'already exists') { %>
+        <p class="my-5">An account with that email already exists. Please <a href="/signup">try again</a>.</p>
+    <% } else { %>
+        <p class="mt-5">The following fields are required:</p>
+        <% if (!name) %> <br>name
+        <% if (!email) %> <br>email
+        <% if (!password) %> <br>password
+        <br><br><p>Please <a href="/signup">Try again.</a></p>
+    <% } %>
+</div>
+
+<%- include("templates/foot") %>
