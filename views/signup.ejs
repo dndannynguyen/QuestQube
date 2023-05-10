@@ -1,0 +1,20 @@
+<%- include("templates/head") %>
+
+<div class="container">
+    <h1>Sign up</h1>
+    <br>
+    <form action='/signupSubmit' method='post'>
+        <input name='name' type='text' placeholder='name' />
+        <br>
+        <br>
+        <input name='email' type='email' placeholder='email' />
+        <br>
+        <br>
+        <input name='password' type='password' placeholder='password' />
+        <br>
+        <br>
+        <button class="btn btn-success">Submit</button>
+    </form>
+</div>
+
+<%- include("templates/foot") %>
