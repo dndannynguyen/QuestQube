@@ -92,14 +92,6 @@ app.post('/signupSubmit', async (req, res) => {
     }
 })
 
-app.post('/securityQuestion', async (req, res) => {
-    const email = req.session.email;
-    const user = await userModel.findOne({ email: email });
-    res.render('securityQuestion');
-
-})
-
-
 // LOGIN PAGE
 app.get('/login', (req, res) => {
     res.render('login', { stylesheetPath: ['/styles/login.css'] })
