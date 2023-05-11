@@ -47,7 +47,7 @@ app.use(session({
 
 // SIGN UP PAGE
 app.get('/signup', (req,res) => {
-    res.render('signup', { stylesheetPath: './styles/login.css' })
+    res.render('signup', { stylesheetPath: ['./styles/login.css'] })
 });
 
 // SIGN UP SUBMIT PAGE
@@ -90,6 +90,13 @@ app.post('/signupSubmit', async (req, res) => {
     } catch (error) {
         res.render('signupSubmit.ejs', { error: 'invalid', name: req.body.name, email: req.body.email, password: req.body.password })
     }
+})
+
+app.post('/securityQuestion', async (req, res) => {
+    const email = req.session.email;
+    const user = await userModel.findOne({ email: email });
+    res.render('securityQuestion');
+
 })
 
 
