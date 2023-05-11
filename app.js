@@ -155,8 +155,6 @@ app.post('/updateInfo', async (req, res) => {
   
     // Check if the user exists
     if (user) {
-      // Check if the current password field matches the actual password
-      const currentPassword = req.body.currentPassword;
       console.log(user.name)
   
       // Update the fields if they are changed
@@ -189,15 +187,24 @@ app.post('/updateInfo', async (req, res) => {
             }
         });
       }
-  
-      // Update the password if a new password is provided
-    //   if (newPassword) {
-    //     // Set the new password after proper validation (e.g., password strength)
-    //     user.password = newPassword;
-    //   }
-  
-      // Save the updated user document to the database
-    //   await user.save();
+
+      const result = await userModel.find({
+        email: email,
+    })
+    if (result.length == 0) {
+        res.render('loginSubmit.ejs')
+    } else if (bcrypt.compareSync(confirmPassword, result[0].password)) {
+        console.log("passwords match")
+        if (newPassword !== user.password) {
+            await userCollection.updateOne({
+                email: email
+            }, {
+                $set: {
+                    password: bcrypt.hashSync(newPassword, 12)
+                }
+            });
+        }
+    }
   
       // Redirect or respond with a success message
       return res.redirect('/profile');
