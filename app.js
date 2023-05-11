@@ -56,7 +56,7 @@ app.post('/signupSubmit', async (req, res) => {
         username: joi.string().required(),
         name: joi.string().required(),
         email: joi.string().email().required(),
-        password: joi.string().required(),
+        password: joi.string().min(8).required().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/),
         dob: joi.string().required()
     })
     try {
@@ -67,6 +67,16 @@ app.post('/signupSubmit', async (req, res) => {
         })
         if (result.length > 0) {
             res.render('signupSubmit.ejs', { error: 'already exists' })
+        } else if (password.length < 8) {
+            res.render('signupSubmit.ejs', { error: 'min 8' })
+        } else if (!password.match(/^(?=.*[a-z]).*$/)) {
+            res.render('signupSubmit.ejs', { error: 'no lower' })
+        } else if (!password.match(/^(?=.*[A-Z]).*$/)) {
+            res.render('signupSubmit.ejs', { error: 'no upper' })
+        } else if (!password.match(/^(?=.*\d).*$/)) {
+            res.render('signupSubmit.ejs', { error: 'no digits' })
+        } else if (!password.match(/^(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/)) {
+            res.render('signupSubmit.ejs', { error: 'no symbols' })
         } else {
             const user = new userModel({
                 username: username,
