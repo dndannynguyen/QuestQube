@@ -44,11 +44,6 @@ app.use(session({
     resave: true
 }));
 
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-
-})
-
 
 // SIGN UP PAGE
 app.get('/signup', (req,res) => {
@@ -101,7 +96,9 @@ app.post('/signupSubmit', async (req, res) => {
 app.get('/login', (req, res) => {
     res.render('login', { stylesheetPath: '/path/to/stylesheet.css' })
 })
-
+app.get("/", (req, res) => {
+  res.render("index" , { stylesheetPath: 'styles/index.css' });
+});
 // LOGIN SUBMIT PAGE
 app.post('/loginSubmit', async (req, res) => {
     const schema = joi.object({
