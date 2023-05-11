@@ -147,6 +147,16 @@ app.get('/profile', async (req, res) => {
     res.render('profile', { username: username, name: name, email: email, dob: dob, stylesheetPath: './styles/profile.css' })
 })
 
+app.get('/logout', (req, res) => {
+    req.session.destroy()
+    res.redirect('/')
+})
+
+app.post('/logout', (req, res) => {
+    req.session.destroy()
+    res.redirect('/')
+})
+
 app.post('/updateInfo', async (req, res) => {
     // Retrieve the user's session name
     const email = req.session.email;
