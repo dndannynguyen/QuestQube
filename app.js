@@ -129,7 +129,6 @@ app.post('/loginSubmit', async (req, res) => {
 
 app.get('/profile', async (req, res) => {
     const email = req.session.email;
-    console.log(email)
     const result = await userModel.find({email: email});
     const username = result[0].username;
     const name = result[0].name;
@@ -148,7 +147,6 @@ app.post('/updateInfo', async (req, res) => {
     const updatedDob = req.body.dob;
     const newPassword = req.body.newPassword;
     const confirmPassword = req.body.confirmPassword;
-    console.log(updatedName)
   
     // Fetch the user document from the database
     const user = await userModel.findOne({ email: email });
@@ -213,6 +211,12 @@ app.post('/updateInfo', async (req, res) => {
     // Handle the case if the user does not exist
     return res.status(404).send('User not found');
   });
+
+  app.get('/wishlist', async (req, res) => {
+    const email = req.session.email;
+    const result = await userModel.find({email: email});
+    res.render('wishlist', { wishlist: result[0].wishlist, stylesheetPath: './styles/wishlist.css' })
+})
   
 
 module.exports = app
