@@ -95,7 +95,7 @@ app.post('/signupSubmit', async (req, res) => {
 
 // LOGIN PAGE
 app.get('/login', (req, res) => {
-    res.render('login', { stylesheetPath: '/path/to/stylesheet.css' })
+    res.render('login', { stylesheetPath: ['/styles/login.css'] })
 })
 app.get("/", (req, res) => {
   res.render("index" , { stylesheetPath: 'styles/index.css' });
