@@ -82,6 +82,7 @@ app.post('/signupSubmit', async (req, res) => {
             await user.save()
             req.session.GLOBAL_AUTHENTICATION = true
             req.session.name = name
+            req.session.email = email
             req.session.type = 'user'
             req.session.cookie.maxAge = expireTime
             res.redirect('/profile')
@@ -215,7 +216,8 @@ app.post('/updateInfo', async (req, res) => {
   app.get('/wishlist', async (req, res) => {
     const email = req.session.email;
     const result = await userModel.find({email: email});
-    res.render('wishlist', { wishlist: result[0].wishlist, stylesheetPath: './styles/wishlist.css' })
+    const stylesheets = ['/styles/wishlist.css']
+    res.render('wishlist', { wishlist: result[0].wishlist, stylesheetPath: stylesheets })
 })
   
 
