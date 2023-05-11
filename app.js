@@ -115,6 +115,7 @@ app.post('/loginSubmit', async (req, res) => {
         } else if (bcrypt.compareSync(req.body.password, result[0].password)) {
             req.session.GLOBAL_AUTHENTICATION = true
             req.session.name = result[0].name
+            req.session.email= result[0].email
             req.session.type = result[0].type
             req.session.cookie.maxAge = expireTime
             res.redirect('/profile')
@@ -126,8 +127,92 @@ app.post('/loginSubmit', async (req, res) => {
     }
 })
 
-app.get('/profile', (req, res) => {
-    res.render('profile', { stylesheetPath: '/path/to/stylesheet.css' })
+app.get('/profile', async (req, res) => {
+    const email = req.session.email;
+    console.log(email)
+    const result = await userModel.find({email: email});
+    const username = result[0].username;
+    const name = result[0].name;
+    const dob = result[0].dob;
+    res.render('profile', { username: username, name: name, email: email, dob: dob, stylesheetPath: './styles/profile.css' })
 })
+
+app.post('/updateInfo', async (req, res) => {
+    // Retrieve the user's session name
+    const email = req.session.email;
+  
+    // Retrieve the user's entered values from the form
+    const updatedName = req.body.name;
+    const updatedUsername = req.body.username;
+    const updatedEmail = req.body.email;
+    const updatedDob = req.body.dob;
+    const newPassword = req.body.newPassword;
+    const confirmPassword = req.body.confirmPassword;
+    console.log(updatedName)
+  
+    // Fetch the user document from the database
+    const user = await userModel.findOne({ email: email });
+  
+    // Check if the user exists
+    if (user) {
+      console.log(user.name)
+  
+      // Update the fields if they are changed
+      if (updatedName !== user.name) {
+        await userCollection.updateOne({
+            email: email
+        }, {
+            $set: {
+                name: updatedName
+            }
+        });
+      }
+  
+      if (updatedUsername !== user.username) {
+        await userCollection.updateOne({
+            email: email
+        }, {
+            $set: {
+                username: updatedUsername
+            }
+        });
+      }
+  
+      if (updatedDob !== user.dob) {
+        await userCollection.updateOne({
+            email: email
+        }, {
+            $set: {
+                dob: updatedDob
+            }
+        });
+      }
+
+      const result = await userModel.find({
+        email: email,
+    })
+    if (result.length == 0) {
+        res.render('loginSubmit.ejs')
+    } else if (bcrypt.compareSync(confirmPassword, result[0].password)) {
+        console.log("passwords match")
+        if (newPassword !== user.password) {
+            await userCollection.updateOne({
+                email: email
+            }, {
+                $set: {
+                    password: bcrypt.hashSync(newPassword, 12)
+                }
+            });
+        }
+    }
+  
+      // Redirect or respond with a success message
+      return res.redirect('/profile');
+    }
+  
+    // Handle the case if the user does not exist
+    return res.status(404).send('User not found');
+  });
+  
 
 module.exports = app
