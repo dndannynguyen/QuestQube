@@ -1,5 +1,7 @@
-<%- include("templates/head", { stylesheetPath: stylesheetPath }) %>
-  <div class="container mt-5">
+<%- include("templates/head", { stylesheetPath:
+['/styles/favourites.css','/styles/nav.css','/styles/foot.css','/styles/profile.css','/styles/gameSearchbar.css'] }) %> <%-
+include("templates/nav") %>
+  <div class="favourites mt-5">
     <div class="row">
       <%- include("templates/profile_picture") %>
         <!-- Favourites -->
@@ -7,7 +9,7 @@
           <script src="/scripts/gameSearchbar.js"></script>
           <script src="/scripts/scrapeImages.js"></script>
           <div id="favourites-container">
-            <div class="container">
+            <div class="favourites">
               <form autocomplete="off" action="/addFavourite" method="post" onsubmit="convertToURLFormat()">
                 <h4>Add a new favourite</h4>
                 <%- include('templates/gameSearchbar') %>
@@ -22,7 +24,7 @@
                         <form action="/removeFavourite" method="post">
                           <input type="hidden" name="game" value=<%=favourites[i] %>>
                           <button type="submit" class="btn btn-danger my-2"
-                            style="width: 100%; margin-top: 5px;">Remove</button>
+                            style="width: 93%; margin-top: 5px;">Remove</button>
                         </form>
                       </div>
                     </div>
@@ -38,4 +40,4 @@
     </div>
   </div>
 
-  <% include('templates/foot') %>
+<%- include("templates/foot") %>
