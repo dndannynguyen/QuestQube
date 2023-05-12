@@ -1,9 +1,9 @@
 body {
     background-color: #292929;
-    color: gold;
+    color: #D6AD60;
 }
 
-.container {
+.signup-form {
     width: 400px;
     margin: auto;
     margin-top: 50px;
@@ -31,6 +31,7 @@ input[type="date"] {
     margin-bottom: 15px;
     font-size: 18px;
     color: gray;
+    height: 40px;
 }
 
 label {
@@ -38,11 +39,11 @@ label {
     font-weight: bold;
     display: inline-block;
     text-align: left;
-    width: 100px;
+    width: 100%;
 }
 
-.container button {
-    background-color: gold;
+.signup-form button {
+    background-color: #D6AD60;
     color: black;
     padding: 10px 20px;
     border: none;
@@ -51,12 +52,20 @@ label {
     cursor: pointer;
 }
 
-.container button:hover {
+.signup-form button:hover {
     background-color: black;
-    color: goldenrod;
+    color: #D6AD60;
     font-size: 20px;
 }
-
+#dropdown{
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: gray;
+}
 button:focus {
     outline: none;
 }

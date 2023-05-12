@@ -1,5 +1,5 @@
 <%- include("templates/head", { stylesheetPath:
-['/styles/nav.css','/styles/foot.css'] }) %> <%- include("templates/nav") %>
+['/styles/signup.css','/styles/nav.css','/styles/foot.css'] }) %> <%- include("templates/nav") %>
 <div class="signup-form">
   <h1>Sign up</h1>
   <br />
@@ -24,7 +24,7 @@
     <input name="dob" type="date" placeholder="DOB" />
     <br />
     <br />
-    <div>
+    
       <label for="securityQuestion">Security Question?</label>
       <select name="security_question" id="dropdown">
         <option value="Where was your mother born?">
@@ -44,8 +44,8 @@
           What model your first smartphone was?
         </option>
       </select>
-    </div>
-    <div>
+    <br><br>
+    
       <label for="secQuestAnswer">Type your security question here</label>
       <input
         type="text"
@@ -53,7 +53,7 @@
         name="security_answer"
         placeholder="Answer here"
       />
-    </div>
+   <br>
     <button class="btn btn-success"><b>Submit</b></button>
   </form>
 </div>
