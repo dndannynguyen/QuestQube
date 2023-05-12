@@ -1,7 +1,7 @@
 body {
     margin-top: 20px;
     background-color: #292929;
-    color: gold
+    color: #D6AD60
 }
 
 .img-account-profile {
@@ -90,4 +90,29 @@ background-color: #d8c690;
 }
 .img-account-profile {
     height: 10rem;
+}
+@media screen and (max-width: 768px){
+    #dropdown {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            margin-left: 40px;
+            font-size: 18px;
+            color: gray;
+        }
+        .profile-container{
+            margin-bottom: 100px;
+        }
+        .form-control{
+            width: 80%;
+            margin-left: 40px;
+        }
+        label{
+            margin-left: 40px;
+        }
+        button{
+            margin-left: 40px;
+        }
 }

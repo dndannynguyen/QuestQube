@@ -7,7 +7,7 @@
 
 body {
     background-color: #292929;
-    color: gold
+    color: #D6AD60
 }
 
 .container {
@@ -40,7 +40,7 @@ input[type="password"] {
 }
 
 input[type="submit"] {
-    background-color: gold;
+    background-color: #D6AD60;
     color: black;
     padding: 10px 20px;
     border: none;
@@ -52,7 +52,7 @@ input[type="submit"] {
 
 input[type="submit"]:hover {
     background: black;
-    color: goldenrod;
+    color: #D6AD60;
     transition: all 0.3s ease;
 }
 
