@@ -316,8 +316,9 @@ app.post('/removeFavourite', userAuthenticator, async (req, res) => {
   app.get('/wishlist', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const result = await userModel.find({email: email});
+    const profilePic = result[0].profilePic;
     const stylesheets = ['/styles/wishlist.css']
-    res.render('wishlist', { wishlist: result[0].wishlist, stylesheetPath: stylesheets })
+    res.render('wishlist', { wishlist: result[0].wishlist, profilePic: profilePic, stylesheetPath: stylesheets })
 })
 
 app.get("*", (req, res) => {
