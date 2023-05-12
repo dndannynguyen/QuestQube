@@ -57,7 +57,8 @@ label {
     color: #D6AD60;
     font-size: 20px;
 }
-#dropdown{
+
+#dropdown {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
@@ -66,11 +67,18 @@ label {
     font-size: 18px;
     color: gray;
 }
+
 button:focus {
     outline: none;
 }
-@media screen and (max-width: 768px){
-    .signup-form{
+
+@media screen and (max-width: 768px) {
+    .signup-form {
         margin-bottom: 150px;
+    }
+
+    form {
+        width: 80%;
+        margin: auto;
     }
 }

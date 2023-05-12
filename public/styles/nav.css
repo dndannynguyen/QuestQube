@@ -43,9 +43,11 @@ nav {
     font-weight: 520;
     font-size: 16px;
 }
-.nav-left ul{
+
+.nav-left ul {
     margin-top: 10px
 }
+
 .nav-left ul li a:hover {
     background: #D6AD60;
     color: black;
@@ -98,5 +100,9 @@ nav {
 
     .nav-left img {
         margin-right: 25px;
+    }
+
+    .search-box input {
+        margin-bottom: 0px;
     }
 }

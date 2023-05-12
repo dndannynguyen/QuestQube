@@ -60,6 +60,17 @@ input[type="submit"]:focus {
     outline: none;
 }
 
+.login-form a {
+    color: #D6AD60;
+    text-decoration: none;
+    font-size: 14px;
+    line-height: 20px;
+    margin-top: 10px;
+    border-radius: 5px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 @media (min-aspect-ratio: 16/9) {
     .back-video {
         width: 100%;
@@ -71,5 +82,16 @@ input[type="submit"]:focus {
     .back-video {
         width: auto;
         height: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .signup-form {
+        margin-bottom: 150px;
+    }
+
+    form {
+        width: 80%;
+        margin: auto;
     }
 }
