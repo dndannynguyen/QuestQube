@@ -44,6 +44,13 @@ app.use(session({
     resave: true
 }));
 
+// AUTHENTICATION MIDDLEWARE
+const userAuthenticator = (req, res, next) => {
+    if (!req.session.GLOBAL_AUTHENTICATION) {
+        return res.redirect('/login')
+    }
+    next()
+}
 
 // SIGN UP PAGE
 app.get('/signup', (req,res) => {
@@ -181,7 +188,7 @@ app.post('/updatePassword', async (req, res) => {
     res.redirect('/profile')
 })
 
-app.get('/profile', async (req, res) => {
+app.get('/profile', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const result = await userModel.find({email: email});
     const username = result[0].username;
@@ -191,7 +198,7 @@ app.get('/profile', async (req, res) => {
     res.render('profile', { username: username, name: name, email: email, dob: dob, profilePic: profilePic, stylesheetPath: './styles/profile.css' })
 })
 
-app.get('/saveImage', async (req, res) => {
+app.get('/saveImage', userAuthenticator, async (req, res) => {
     var selectedImage = req.query.selectedImage;
     console.log(selectedImage);
     const email = req.session.email;
@@ -199,19 +206,13 @@ app.get('/saveImage', async (req, res) => {
     await userCollection.updateOne({ email: email }, { $set: { profilePic: `/mediaResources/Avatars/${selectedImage}.jpg` } });
     res.redirect('/profile');
   });
-  
 
 app.get('/logout', (req, res) => {
     req.session.destroy()
     res.redirect('/')
 })
 
-app.post('/logout', (req, res) => {
-    req.session.destroy()
-    res.redirect('/')
-})
-
-app.post('/updateInfo', async (req, res) => {
+app.post('/updateInfo', userAuthenticator, async (req, res) => {
     // Retrieve the user's session name
     const email = req.session.email;
 
@@ -289,7 +290,7 @@ app.post('/updateInfo', async (req, res) => {
 });
 
 // FAVOURITES PAGE
-app.get('/favourites', async (req, res) => {
+app.get('/favourites', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const user = await userModel.findOne({ email: email });
 
@@ -297,7 +298,7 @@ app.get('/favourites', async (req, res) => {
 })
 
 // ADD FAVOURITE
-app.post('/addFavourite', async (req, res) => {
+app.post('/addFavourite', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const favourite = req.body.game;
     await userCollection.updateOne({ email: email }, { $push: {favourites: favourite} });
@@ -305,14 +306,14 @@ app.post('/addFavourite', async (req, res) => {
 })
 
 // REMOVE FAVOURITE
-app.post('/removeFavourite', async (req, res) => {
+app.post('/removeFavourite', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const favourite = req.body.game;
     await userCollection.updateOne({ email: email }, { $pull: {favourites: favourite} });
     res.redirect('/favourites')
 })
 
-  app.get('/wishlist', async (req, res) => {
+  app.get('/wishlist', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const result = await userModel.find({email: email});
     const stylesheets = ['/styles/wishlist.css']
