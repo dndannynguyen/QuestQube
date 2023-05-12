@@ -1,0 +1,131 @@
+body {
+    margin-top: 20px;
+    background-color: #292929;
+    color: #D6AD60
+}
+
+.img-account-profile {
+    height: 10rem;
+}
+
+.row {
+    width: 99.5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.rounded-circle {
+    border-radius: 50% !important;
+}
+
+.card {
+    box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+    background-color: #be9e44;
+}
+
+.card .card-header {
+    font-weight: 500;
+}
+
+.card-header:first-child {
+    border-radius: 0.35rem 0.35rem 0 0;
+}
+
+.linebox {
+    background-color: #d8c690;
+    margin: 0px;
+    padding: 7.5, 12.5, 7.5, 12.5;
+}
+.card-header {
+    padding: 1rem 1.35rem;
+    margin-bottom: 0;
+    background-color: rgba(33, 40, 50, 0.03);
+    border-bottom: 1px solid rgba(33, 40, 50, 0.125);
+}
+
+.list-group-item i {
+display: inline-block;
+margin-top: -1px;
+margin-right: 8px;
+font-size: 1.2em;
+vertical-align: middle;
+}
+
+.mr-1, .mx-1 {
+margin-right: .25rem !important;
+}
+
+.dropdown {
+    color: black
+}
+
+.list-group-flush .list-group-item {
+border-right: 0;
+border-left: 0;
+border-radius: 0;
+}
+.list-group-flush {
+    padding: 0;
+}
+
+a.list-group-item, .list-group-item-action {
+color: #404040;
+font-weight: 600;
+}
+.list-group-item {
+padding-top: 16px;
+padding-bottom: 16px;
+-webkit-transition: all .3s;
+transition: all .3s;
+border: 1px solid #424242 !important;
+border-radius: 0 !important;
+color: #404040;
+font-size: 12px;
+font-weight: 600;
+letter-spacing: .08em;
+text-transform: uppercase;
+text-decoration: none;
+width: 100%;
+}
+.list-group-item {
+position: relative;
+display: block;
+padding: .75rem 1.25rem;
+margin-bottom: 1px;
+background-color: #d8c690;
+}
+
+.selected {
+    border: 5px solid green;
+}
+.img-account-profile {
+    height: 10rem;
+}
+
+@media screen and (max-width: 768px){
+    #dropdown {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            margin-left: 40px;
+            font-size: 18px;
+            color: gray;
+        }
+        .profile-container{
+            margin-bottom: 100px;
+        }
+        .form-control{
+            width: 80%;
+            margin-left: 40px;
+        }
+        label{
+            margin-left: 40px;
+        }
+        button{
+            margin-left: 40px;
+        }
+             .list-group-item {
+                    width: 100%;          
+                }
+}

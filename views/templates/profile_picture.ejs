@@ -1,0 +1,86 @@
+<div class="col-lg-4 pb-5">
+    <!-- Account Sidebar-->
+    <div class="card mb-4 mb-xl-0">
+        <div class="card-header">Profile Picture</div>
+        <div class="card-body text-center">
+            <!-- Profile picture image-->
+            <% if (profilePic == null) { %>
+            <img class="img-account-profile rounded-circle mb-2"
+                src="https://t4.ftcdn.net/jpg/05/09/59/75/360_F_509597532_RKUuYsERhODmkxkZd82pSHnFtDAtgbzJ.jpg"
+                alt="">
+            <% } else { %>
+            <img class="img-account-profile rounded-circle mb-2" src="<%= profilePic %>" alt="">
+            <% } %>
+            <!-- Profile picture upload button-->
+            <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Choose your profile picture
+              </button>
+        </div>
+        <div class="wizard">
+            <!-- Wizard for different pages -->
+            <nav class="list-group list-group-flush mb-0">
+                <a class="list-group-item" href="/profile">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="d-inline-block font-weight-medium text-uppercase">Profile Settings
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                <a class="list-group-item" href="/wishlist">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="d-inline-block font-weight-medium text-uppercase">My Wishlist</div>
+                        </div>
+                    </div>
+                </a>
+                <a class="list-group-item" href="/favourites">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="d-inline-block font-weight-medium text-uppercase">Favorite Games
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </nav>
+        </div>
+    </div>
+    <div class="modal" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Choose your profile picture</h5>
+              <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-header">
+                    <div class="row row-cols-4">
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/1.jpg" value="1"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/2.jpg" value="2"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/3.jpg" value="3"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/4.jpg" value="4"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/5.jpg" value="5"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/6.jpg" value="6"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/7.jpg" value="7"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/8.jpg" value="8"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/9.jpg" value="9"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/10.jpg" value="10"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/11.jpg" value="11"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/12.jpg" value="12"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/13.jpg" value="13"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/14.jpg" value="14"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/15.jpg" value="15"></div>
+                        <div class="col"><img class="img-account-profile" src="/mediaResources/Avatars/16.jpg" value="16"></div>
+                    </div>
+                  </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button id="saveChangesButton" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+</div>

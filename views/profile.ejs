@@ -1,0 +1,123 @@
+<%- include("templates/head", { stylesheetPath:['/styles/profile.css','/styles/nav.css','/styles/foot.css'] }) %>
+<%- include("templates/nav") %>
+    <div class="profile-container mt-5 .col-xs">
+        <div class="row">
+            <%- include("templates/profile_picture") %>
+            <!-- Profile Settings-->
+            <div class="col-lg-8 pb-5">
+                <form class="row" action="/updateInfo" method="post">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="account-fn">Name</label>
+                            <input class="form-control" type="text" name="name" value="<%= name %>" required="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="account-ln">Username</label>
+                            <input class="form-control" type="text" name="username" value="<%= username %>" required="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="account-email">E-mail Address</label>
+                            <input class="form-control" type="email" name="email" value="<%= email %>" disabled="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="account-phone">Date of Birth</label>
+                            <input class="form-control" type="Date" name="dob" value="<%= dob %>" required="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="account-pass">New Password</label>
+                            <input class="form-control" type="password" name="newPassword" placeholder="Enter New Password">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="account-confirm-pass">Confirm Password</label>
+                            <input class="form-control" type="password" name="confirmPassword" placeholder="Confirm Old Password">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label for="securityQuestion">Security Question?</label>
+                        <select class="form-control mb-4" name="security_question">
+                            <option value="Where was your mother born?">Where was your mother born?</option>
+                            <option value="What was your first car?">What was your first car?</option>
+                            <option value="What was the first name of your first pet?">What was the first name of your first pet?</option>
+                            <option value="What was your school name?">What was your school name?</option>
+                            <option value="Where were you born?">Where were you born?</option>
+                            <option value="What model your first smartphone was?">What model your first smartphone was?</option>
+                        </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label for="secQuestAnswer">Security Question Answer</label>
+                        <input type="text" class="form-control" name="security_answer" placeholder="Answer here">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                        <label class="pr-10 " for="secQuestAnswer">Gaming ID</label>
+                        <select class="form-control mb-4" name="gaming_platform">
+                            <option value="Discord">Discord</option>
+                            <option value="Steam">Steam</option>
+                            <option value="Nintendo Switch">Nintendo Switch</option>
+                            <option value="Playstation">Playstation</option>
+                            <option value="Xbox">Xbox</option>
+                        </select>
+                        <input type="text" class="form-control" name="gaming_id" placeholder="Gaming ID">
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <hr class="mt-2 mb-3" style="border: 0px">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center">
+                            <button class="btn btn-style-1 btn-outline-warning" type="submit" data-toast=""
+                                data-toast-position="topRight" data-toast-type="success"
+                                data-toast-icon="fe-icon-check-circle" data-toast-title="Success!"
+                                data-toast-message="Your profile updated successfuly."
+                                onclick="window.location.href='/updateInfo';">Update Profile</button>
+                        </div>
+                    </div>
+                </form>
+                <form class="row" action="/logout" method="get">
+                    <div class="col-12">
+                        <hr class="mt-2 mb-3" style="border: 0px">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center">
+                            <button class="btn btn-style-1 btn-secondary text-dark" type="submit" data-toast=""
+                                data-toast-position="topRight" data-toast-type="success"
+                                data-toast-icon="fe-icon-check-circle" data-toast-title="Success!"
+                                data-toast-message="Your profile updated successfuly."
+                                onclick="window.location.href='/logout';">Logout</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            $('.img-account-profile').click(function() {
+                // Remove 'selected' class from all images
+                $('.img-account-profile').removeClass('selected');
+    
+                // Add 'selected' class to the clicked image
+                $(this).addClass('selected');
+            });
+    
+            $('#saveChangesButton').click(function() {
+                var selectedImage = $('.img-account-profile.selected').attr('value');
+                // Perform any necessary AJAX request or form submission to save the selected image value
+                // Redirect to the desired route, e.g., using window.location.href
+                window.location.href = '/saveImage?selectedImage=' + selectedImage;
+            });
+        });
+    </script>
+    
+    
+    <%- include("templates/foot") %>

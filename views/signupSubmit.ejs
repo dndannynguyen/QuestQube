@@ -1,0 +1,23 @@
+<%- include("templates/head", { stylesheetPath: ['/styles/signupSubmit.css'] }) %>
+
+<div class="container">
+    <% if (error == 'already exists') { %>
+        <p class="my-5">An account with that email already exists. Please <a href="/signup">try again</a>.</p>
+    <% } else { %>
+        <p class="mt-5">The following fields are required:</p>
+        <% if (!name) %> <br>name
+        <% if (!email) %> <br>email
+        <% if (!password) %> <br>password must contain at least: <br><br>
+        <ul>
+            <li>8 characters</li>
+            <li>1 uppercase letter</li>
+            <li>1 lowercase letter</li>
+            <li>1 number</li>
+            <li>1 special character</li>
+        </ul>
+        <br><br>
+        <p>Please <a href="/signup">Try again.</a></p>
+    <% } %>
+</div>
+
+<%- include("templates/foot") %>
