@@ -293,15 +293,15 @@ app.post('/updateInfo', userAuthenticator, async (req, res) => {
 app.get('/favourites', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const user = await userModel.findOne({ email: email });
-
-    res.render('favourites', { stylesheetPath: ['/styles/favourites.css'], favourites: user.favourites })
+    const profilePic = user.profilePic;
+    res.render('favourites', { stylesheetPath: ['/styles/favourites.css', '/styles/profile.css'], favourites: user.favourites, profilePic: profilePic })
 })
 
 // ADD FAVOURITE
 app.post('/addFavourite', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const favourite = req.body.game;
-    await userCollection.updateOne({ email: email }, { $push: {favourites: favourite} });
+    await userCollection.updateOne({ email: email }, { $push: {favourites: favourite},  });
     res.redirect('/favourites')
 })
 
