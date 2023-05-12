@@ -21,6 +21,21 @@
         <input name='dob' type='date' placeholder='DOB' />
         <br>
         <br>
+        <div>
+            <label for="securityQuestion">Security Question?</label>
+            <select name="security_question" id="dropdown">
+                <option value="Where was your mother born?">Where was your mother born?</option>
+                <option value="What was your first car?">What was your first car?</option>
+                <option value="What was the first name of your first pet?">What was the first name of your first pet?</option>
+                <option value="What was your school name?">What was your school name?</option>
+                <option value="Where were you born?">Where were you born?</option>
+                <option value="What model your first smartphone was?">What model your first smartphone was?</option>
+            </select>
+        </div>
+        <div>
+            <label for="secQuestAnswer">Type your security question here</label>
+            <input type="text" class="form-control" name="security_answer" placeholder="Answer here">
+        </div>
         <button class="btn btn-success">Submit</button>
     </form>
 </div>

@@ -47,7 +47,7 @@ app.use(session({
 
 // SIGN UP PAGE
 app.get('/signup', (req,res) => {
-    res.render('signup', { stylesheetPath: './styles/login.css' })
+    res.render('signup', { stylesheetPath: ['./styles/login.css'] })
 });
 
 // SIGN UP SUBMIT PAGE
@@ -57,14 +57,18 @@ app.post('/signupSubmit', async (req, res) => {
         name: joi.string().required(),
         email: joi.string().email().required(),
         password: joi.string().min(8).required().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/),
-        dob: joi.string().required()
+        dob: joi.string().required(),
+        security_question: joi.string().required(),
+        security_answer: joi.string().required()
     })
     try {
-        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password, username: req.body.username, dob: req.body.dob })
-        const { username, name, email, password, dob } = req.body;
+        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password, username: req.body.username, dob: req.body.dob, security_question: req.body.security_question, security_answer: req.body.security_answer })
+        console.log('b')
+        const { username, name, email, password, dob, security_question, security_answer } = req.body;
         const result = await userModel.find({
             email: email
         })
+        console.log("a")
         if (result.length > 0) {
             res.render('signupSubmit.ejs', { error: 'already exists' })
         } else if (password.length < 8) {
@@ -84,11 +88,15 @@ app.post('/signupSubmit', async (req, res) => {
                 email: email,
                 password: bcrypt.hashSync(password, 12),
                 type: 'user',
+                security_question: security_question,
+                security_answer: bcrypt.hashSync(security_answer, 12),
+                
                 wishlist: [],
                 favourites: [],
                 history: [],
                 dob: dob
             })
+            console.log(user)
             await user.save()
             req.session.GLOBAL_AUTHENTICATION = true
             req.session.name = name
@@ -101,7 +109,6 @@ app.post('/signupSubmit', async (req, res) => {
         res.render('signupSubmit.ejs', { error: 'invalid', name: req.body.name, email: req.body.email, password: req.body.password })
     }
 })
-
 
 // LOGIN PAGE
 app.get('/login', (req, res) => {
@@ -136,6 +143,39 @@ app.post('/loginSubmit', async (req, res) => {
     } catch (error) {
         res.redirect('/login')
     }
+})
+
+app.get('/forgotPassword', async (req, res) => {
+    res.render('forgotPassword', { stylesheetPath: ['./styles/login.css'] })
+})
+
+app.post('/securityQuestion', async (req, res) => {
+    const email = req.body.email
+    req.session.email = email
+    const user = await userCollection.findOne({ email: email })
+    if (user) {
+        const security_question = user.security_question
+        res.render('securityQuestion', { security_question: security_question, stylesheetPath: ['./styles/login.css'] })
+    }
+})
+
+app.post('/changePassword', async (req, res) => {
+    const security_answer = req.body.security_answer
+    console.log(security_answer)
+    const email = req.session.email
+    console.log(email)
+    const user = await userCollection.findOne({ email: email })
+    console.log(user.security_answer)
+    if (bcrypt.compareSync(security_answer, user.security_answer)) {
+        res.render('changePassword', { stylesheetPath: ['./styles/login.css'] })
+    }
+})
+
+app.post('/updatePassword', async (req, res) => {
+    const password = req.body.new_password
+    const email = req.session.email
+    await userCollection.updateOne({ email: email }, { $set: { password: bcrypt.hashSync(password, 12) } })
+    res.redirect('/profile')
 })
 
 app.get('/profile', async (req, res) => {
