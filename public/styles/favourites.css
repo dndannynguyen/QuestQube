@@ -53,3 +53,18 @@
     color: white;
     font-size: 2em;
   }
+    .favourites {
+      margin-bottom: 50px;
+    }
+  
+    form {
+      margin-left: 25px;
+    }
+  
+    @media screen and (max-width: 768px) {
+      form button.btn-danger {
+        margin-left: 0;
+        padding-right: 10px;
+        margin-right: 20px
+      }
+    }
