@@ -1,17 +1,27 @@
-<%- include("templates/head", { stylesheetPath: ['/styles/login.css','/styles/nav.css','/styles/foot.css'] }) %>
-<%- include("templates/nav") %>
+<%- include("templates/head", { stylesheetPath:
+['/styles/login.css','/styles/nav.css','/styles/foot.css'] }) %> <%-
+include("templates/nav") %>
 <div class="login-form">
-    <h1>Login</h1>
-    <br>
-    <form method="POST" action="/loginSubmit">
-        <input type="email" name="email" placeholder="email" />
-        <br>
-        <br>
-        <input type="password" name="password" placeholder="password" />
-        <br>
-        <br>
-        <input type="submit" />
-    </form>
+  <h1>Login</h1>
+  <br />
+  <form method="POST" action="/loginSubmit">
+    <input type="email" name="email" placeholder="email" />
+    <br />
+    <br />
+    <input type="password" name="password" placeholder="password" />
+    <br />
+    <br />
+    <input type="submit" />
+    <div class="d-flex flex-wrap justify-content-between align-items-center">
+      <button
+        class="btn btn-style-1 btn-primary"
+        type="submit"
+        onclick="window.location.href='/forgotPassword';"
+      >
+        Forgot Password?
+      </button>
+    </div>
+  </form>
 </div>
 
 <%- include("templates/foot") %>

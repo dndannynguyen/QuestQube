@@ -47,7 +47,7 @@ app.use(session({
 
 // SIGN UP PAGE
 app.get('/signup', (req,res) => {
-    res.render('signup', { stylesheetPath: './styles/login.css' })
+    res.render('signup', { stylesheetPath: ['./styles/login.css'] })
 });
 
 // SIGN UP SUBMIT PAGE
@@ -57,14 +57,18 @@ app.post('/signupSubmit', async (req, res) => {
         name: joi.string().required(),
         email: joi.string().email().required(),
         password: joi.string().min(8).required().regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/),
-        dob: joi.string().required()
+        dob: joi.string().required(),
+        security_question: joi.string().required(),
+        security_answer: joi.string().required()
     })
     try {
-        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password, username: req.body.username, dob: req.body.dob })
-        const { username, name, email, password, dob } = req.body;
+        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password, username: req.body.username, dob: req.body.dob, security_question: req.body.security_question, security_answer: req.body.security_answer })
+        console.log('b')
+        const { username, name, email, password, dob, security_question, security_answer } = req.body;
         const result = await userModel.find({
             email: email
         })
+        console.log("a")
         if (result.length > 0) {
             res.render('signupSubmit.ejs', { error: 'already exists' })
         } else if (password.length < 8) {
@@ -84,11 +88,15 @@ app.post('/signupSubmit', async (req, res) => {
                 email: email,
                 password: bcrypt.hashSync(password, 12),
                 type: 'user',
+                security_question: security_question,
+                security_answer: bcrypt.hashSync(security_answer, 12),
+                
                 wishlist: [],
                 favourites: [],
                 history: [],
                 dob: dob
             })
+            console.log(user)
             await user.save()
             req.session.GLOBAL_AUTHENTICATION = true
             req.session.name = name
@@ -101,7 +109,6 @@ app.post('/signupSubmit', async (req, res) => {
         res.render('signupSubmit.ejs', { error: 'invalid', name: req.body.name, email: req.body.email, password: req.body.password })
     }
 })
-
 
 // LOGIN PAGE
 app.get('/login', (req, res) => {
@@ -140,6 +147,39 @@ app.post('/loginSubmit', async (req, res) => {
     }
 })
 
+app.get('/forgotPassword', async (req, res) => {
+    res.render('forgotPassword', { stylesheetPath: ['./styles/login.css'] })
+})
+
+app.post('/securityQuestion', async (req, res) => {
+    const email = req.body.email
+    req.session.email = email
+    const user = await userCollection.findOne({ email: email })
+    if (user) {
+        const security_question = user.security_question
+        res.render('securityQuestion', { security_question: security_question, stylesheetPath: ['./styles/login.css'] })
+    }
+})
+
+app.post('/changePassword', async (req, res) => {
+    const security_answer = req.body.security_answer
+    console.log(security_answer)
+    const email = req.session.email
+    console.log(email)
+    const user = await userCollection.findOne({ email: email })
+    console.log(user.security_answer)
+    if (bcrypt.compareSync(security_answer, user.security_answer)) {
+        res.render('changePassword', { stylesheetPath: ['./styles/login.css'] })
+    }
+})
+
+app.post('/updatePassword', async (req, res) => {
+    const password = req.body.new_password
+    const email = req.session.email
+    await userCollection.updateOne({ email: email }, { $set: { password: bcrypt.hashSync(password, 12) } })
+    res.redirect('/profile')
+})
+
 app.get('/profile', async (req, res) => {
     const email = req.session.email;
     const result = await userModel.find({email: email});
@@ -149,10 +189,20 @@ app.get('/profile', async (req, res) => {
     res.render('profile', { username: username, name: name, email: email, dob: dob, stylesheetPath: './styles/profile.css' })
 })
 
+app.get('/logout', (req, res) => {
+    req.session.destroy()
+    res.redirect('/')
+})
+
+app.post('/logout', (req, res) => {
+    req.session.destroy()
+    res.redirect('/')
+})
+
 app.post('/updateInfo', async (req, res) => {
     // Retrieve the user's session name
     const email = req.session.email;
-  
+
     // Retrieve the user's entered values from the form
     const updatedName = req.body.name;
     const updatedUsername = req.body.username;
@@ -160,70 +210,95 @@ app.post('/updateInfo', async (req, res) => {
     const updatedDob = req.body.dob;
     const newPassword = req.body.newPassword;
     const confirmPassword = req.body.confirmPassword;
-  
+    console.log(updatedName)
+
     // Fetch the user document from the database
     const user = await userModel.findOne({ email: email });
-  
+
     // Check if the user exists
     if (user) {
-      console.log(user.name)
-  
-      // Update the fields if they are changed
-      if (updatedName !== user.name) {
-        await userCollection.updateOne({
-            email: email
-        }, {
-            $set: {
-                name: updatedName
-            }
-        });
-      }
-  
-      if (updatedUsername !== user.username) {
-        await userCollection.updateOne({
-            email: email
-        }, {
-            $set: {
-                username: updatedUsername
-            }
-        });
-      }
-  
-      if (updatedDob !== user.dob) {
-        await userCollection.updateOne({
-            email: email
-        }, {
-            $set: {
-                dob: updatedDob
-            }
-        });
-      }
+        console.log(user.name)
 
-      const result = await userModel.find({
-        email: email,
-    })
-    if (result.length == 0) {
-        res.render('loginSubmit.ejs')
-    } else if (bcrypt.compareSync(confirmPassword, result[0].password)) {
-        console.log("passwords match")
-        if (newPassword !== user.password) {
+        // Update the fields if they are changed
+        if (updatedName !== user.name) {
             await userCollection.updateOne({
                 email: email
             }, {
                 $set: {
-                    password: bcrypt.hashSync(newPassword, 12)
+                    name: updatedName
                 }
             });
         }
+
+        if (updatedUsername !== user.username) {
+            await userCollection.updateOne({
+                email: email
+            }, {
+                $set: {
+                    username: updatedUsername
+                }
+            });
+        }
+
+        if (updatedDob !== user.dob) {
+            await userCollection.updateOne({
+                email: email
+            }, {
+                $set: {
+                    dob: updatedDob
+                }
+            });
+        }
+
+        const result = await userModel.find({
+            email: email,
+        })
+        if (result.length == 0) {
+            res.render('loginSubmit.ejs')
+        } else if (bcrypt.compareSync(confirmPassword, result[0].password)) {
+            console.log("passwords match")
+            if (newPassword !== user.password) {
+                await userCollection.updateOne({
+                    email: email
+                }, {
+                    $set: {
+                        password: bcrypt.hashSync(newPassword, 12)
+                    }
+                });
+            }
+        }
+
+        // Redirect or respond with a success message
+        return res.redirect('/profile');
     }
-  
-      // Redirect or respond with a success message
-      return res.redirect('/profile');
-    }
-  
+
     // Handle the case if the user does not exist
     return res.status(404).send('User not found');
-  });
+});
+
+// FAVOURITES PAGE
+app.get('/favourites', async (req, res) => {
+    const email = req.session.email;
+    const user = await userModel.findOne({ email: email });
+
+    res.render('favourites', { stylesheetPath: ['/styles/favourites.css'], favourites: user.favourites })
+})
+
+// ADD FAVOURITE
+app.post('/addFavourite', async (req, res) => {
+    const email = req.session.email;
+    const favourite = req.body.game;
+    await userCollection.updateOne({ email: email }, { $push: {favourites: favourite} });
+    res.redirect('/favourites')
+})
+
+// REMOVE FAVOURITE
+app.post('/removeFavourite', async (req, res) => {
+    const email = req.session.email;
+    const favourite = req.body.game;
+    await userCollection.updateOne({ email: email }, { $pull: {favourites: favourite} });
+    res.redirect('/favourites')
+})
 
   app.get('/wishlist', async (req, res) => {
     const email = req.session.email;
