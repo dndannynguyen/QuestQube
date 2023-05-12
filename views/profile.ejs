@@ -2,58 +2,7 @@
 
     <div class="container mt-5 .col-xs">
         <div class="row">
-            <div class="col-lg-4 pb-5">
-                <!-- Account Sidebar-->
-                <div class="card mb-4 mb-xl-0">
-                    <div class="card-header">Profile Picture</div>
-                    <div class="card-body text-center">
-                        <!-- Profile picture image-->
-                        <img class="img-account-profile rounded-circle mb-2"
-                            src="https://t4.ftcdn.net/jpg/05/09/59/75/360_F_509597532_RKUuYsERhODmkxkZd82pSHnFtDAtgbzJ.jpg"
-                            alt="">
-                        <!-- Profile picture help block-->
-                        <div class="small font-italic text-muted mb-4">JPG or PNG no larger than 5 MB</div>
-                        <!-- Profile picture upload button-->
-                        <button class="btn btn-primary" type="button">Upload new image</button>
-                    </div>
-                    <div class="wizard">
-                        <!-- Wizard for different pages -->
-                        <nav class="list-group list-group-flush mb-0">
-                            <a class="list-group-item" href="/profile">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div><i class="fe-icon-heart mr-1 text-muted"></i>
-                                        <div class="d-inline-block font-weight-medium text-uppercase">Profile Settings
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a class="list-group-item" href="/wishlist">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div><i class="fe-icon-heart mr-1 text-muted"></i>
-                                        <div class="d-inline-block font-weight-medium text-uppercase">My Wishlist</div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a class="list-group-item" href="/favorites">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div><i class="fe-icon-tag mr-1 text-muted"></i>
-                                        <div class="d-inline-block font-weight-medium text-uppercase">Favorite Games
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a class="list-group-item" href="https://www.bootdey.com/snippets/view/bs4-account-tickets">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div><i class="fe-icon-tag mr-1 text-muted"></i>
-                                        <div class="d-inline-block font-weight-medium text-uppercase">Games History
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+            <%- include("templates/profile_picture") %>
             <!-- Profile Settings-->
             <div class="col-lg-8 pb-5">
                 <form class="row" action="/updateInfo" method="post">
@@ -96,7 +45,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                         <label for="securityQuestion">Security Question?</label>
-                        <select name="security_question" id="dropdown">
+                        <select class="dropdown" name="security_question" id="dropdown">
                             <option value="Where was your mother born?">Where was your mother born?</option>
                             <option value="What was your first car?">What was your first car?</option>
                             <option value="What was the first name of your first pet?">What was the first name of your first pet?</option>
@@ -114,8 +63,8 @@
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
-                        <label class="pr-10" for="secQuestAnswer">Gaming ID</label>
-                        <select name="gaming_platform" id="dropdown">
+                        <label class="pr-10 " for="secQuestAnswer">Gaming ID</label>
+                        <select class="form-control mb-4" name="gaming_platform" id="dropdown">
                             <option value="Discord">Discord</option>
                             <option value="Steam">Steam</option>
                             <option value="Nintendo Switch">Nintendo Switch</option>
@@ -126,7 +75,7 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <hr class="mt-2 mb-3">
+                        <hr class="mt-2 mb-3" style="border: 0px">
                         <div class="d-flex flex-wrap justify-content-between align-items-center">
                             <button class="btn btn-style-1 btn-primary" type="submit" data-toast=""
                                 data-toast-position="topRight" data-toast-type="success"
@@ -138,7 +87,7 @@
                 </form>
                 <form class="row" action="/logout" method="post">
                     <div class="col-12">
-                        <hr class="mt-2 mb-3">
+                        <hr class="mt-2 mb-3" style="border: 0px">
                         <div class="d-flex flex-wrap justify-content-between align-items-center">
                             <button class="btn btn-style-1 btn-danger text-dark" type="submit" data-toast=""
                                 data-toast-position="topRight" data-toast-type="success"
