@@ -1,0 +1,32 @@
+<%- include('templates/head') %>
+
+<script src="/scripts/scrapeImages.js"></script>
+<div id="favourites-container">
+  <div class="container">
+    <form autocomplete="off" action="/addFavourite" method="post" onsubmit="convertToURLFormat()">
+      <h4>Add a new favourite</h4>
+      <%- include('templates/gameSearchbar') %>
+    </form>
+    <br>
+    <div class="row">
+      <% for (var i=0; i < favourites.length; i++) { %>
+        <div class="col-md-4" style="margin-top: 15px;">
+          <div class="card mb-4">
+            <img id="game-image-<%= i %>" src="" alt="" class="card-img-top" width="120px">
+            <div class="card-body">
+              <form action="/removeFavourite" method="post">
+                <input type="hidden" name="game" value=<%=favourites[i] %>>
+                <button type="submit" class="btn btn-danger my-2" style="width: 120px; margin-top: 5px;">Remove</button>
+              </form>
+            </div>
+          </div>
+        </div>
+        <script>
+          scrapeImages('<%= favourites[i] %>', 'game-image-<%= i %>');
+        </script>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<% include('templates/foot') %>
