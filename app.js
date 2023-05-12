@@ -200,7 +200,7 @@ app.post('/logout', (req, res) => {
 app.post('/updateInfo', async (req, res) => {
     // Retrieve the user's session name
     const email = req.session.email;
-  
+
     // Retrieve the user's entered values from the form
     const updatedName = req.body.name;
     const updatedUsername = req.body.username;
@@ -208,70 +208,95 @@ app.post('/updateInfo', async (req, res) => {
     const updatedDob = req.body.dob;
     const newPassword = req.body.newPassword;
     const confirmPassword = req.body.confirmPassword;
-  
+    console.log(updatedName)
+
     // Fetch the user document from the database
     const user = await userModel.findOne({ email: email });
-  
+
     // Check if the user exists
     if (user) {
-      console.log(user.name)
-  
-      // Update the fields if they are changed
-      if (updatedName !== user.name) {
-        await userCollection.updateOne({
-            email: email
-        }, {
-            $set: {
-                name: updatedName
-            }
-        });
-      }
-  
-      if (updatedUsername !== user.username) {
-        await userCollection.updateOne({
-            email: email
-        }, {
-            $set: {
-                username: updatedUsername
-            }
-        });
-      }
-  
-      if (updatedDob !== user.dob) {
-        await userCollection.updateOne({
-            email: email
-        }, {
-            $set: {
-                dob: updatedDob
-            }
-        });
-      }
+        console.log(user.name)
 
-      const result = await userModel.find({
-        email: email,
-    })
-    if (result.length == 0) {
-        res.render('loginSubmit.ejs')
-    } else if (bcrypt.compareSync(confirmPassword, result[0].password)) {
-        console.log("passwords match")
-        if (newPassword !== user.password) {
+        // Update the fields if they are changed
+        if (updatedName !== user.name) {
             await userCollection.updateOne({
                 email: email
             }, {
                 $set: {
-                    password: bcrypt.hashSync(newPassword, 12)
+                    name: updatedName
                 }
             });
         }
+
+        if (updatedUsername !== user.username) {
+            await userCollection.updateOne({
+                email: email
+            }, {
+                $set: {
+                    username: updatedUsername
+                }
+            });
+        }
+
+        if (updatedDob !== user.dob) {
+            await userCollection.updateOne({
+                email: email
+            }, {
+                $set: {
+                    dob: updatedDob
+                }
+            });
+        }
+
+        const result = await userModel.find({
+            email: email,
+        })
+        if (result.length == 0) {
+            res.render('loginSubmit.ejs')
+        } else if (bcrypt.compareSync(confirmPassword, result[0].password)) {
+            console.log("passwords match")
+            if (newPassword !== user.password) {
+                await userCollection.updateOne({
+                    email: email
+                }, {
+                    $set: {
+                        password: bcrypt.hashSync(newPassword, 12)
+                    }
+                });
+            }
+        }
+
+        // Redirect or respond with a success message
+        return res.redirect('/profile');
     }
-  
-      // Redirect or respond with a success message
-      return res.redirect('/profile');
-    }
-  
+
     // Handle the case if the user does not exist
     return res.status(404).send('User not found');
-  });
+});
+
+// FAVOURITES PAGE
+app.get('/favourites', async (req, res) => {
+    const email = req.session.email;
+    const user = await userModel.findOne({ email: email });
+
+    res.render('favourites', { stylesheetPath: ['/styles/favourites.css'], favourites: user.favourites })
+})
+
+// ADD FAVOURITE
+app.post('/addFavourite', async (req, res) => {
+    const email = req.session.email;
+    const favourite = req.body.game;
+    await userCollection.updateOne({ email: email }, { $push: {favourites: favourite} });
+    res.redirect('/favourites')
+})
+
+// REMOVE FAVOURITE
+app.post('/removeFavourite', async (req, res) => {
+    const email = req.session.email;
+    const favourite = req.body.game;
+    await userCollection.updateOne({ email: email }, { $pull: {favourites: favourite} });
+    res.redirect('/favourites')
+})
 
   app.get('/wishlist', async (req, res) => {
     const email = req.session.email;
