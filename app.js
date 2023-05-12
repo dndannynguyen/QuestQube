@@ -318,6 +318,10 @@ app.post('/removeFavourite', async (req, res) => {
     const stylesheets = ['/styles/wishlist.css']
     res.render('wishlist', { wishlist: result[0].wishlist, stylesheetPath: stylesheets })
 })
-  
+
+app.get("*", (req, res) => {
+  res.status(404);
+  res.render("404");
+});
 
 module.exports = app
