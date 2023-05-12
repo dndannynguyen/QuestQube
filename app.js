@@ -139,6 +139,18 @@ app.get('/forgotPassword', async (req, res) => {
     res.render('forgotPassword', { stylesheetPath: ['./styles/login.css'] })
 })
 
+app.post('/securityQuestion', async (req, res) => {
+    console.log('start')
+    const email = req.body.email
+    console.log(email)
+    const user = await userCollection.findOne({ email: email })
+    console.log(user)
+    if (user) {
+        const security_question = user.security_question
+        res.render('securityQuestion', { security_question: security_question, stylesheetPath: ['./styles/login.css'] })
+    }
+})
+
 app.get('/profile', async (req, res) => {
     const email = req.session.email;
     const result = await userModel.find({email: email});
