@@ -1,27 +1,30 @@
-<%- include("templates/head", { stylesheetPath: ['/styles/login.css'] }) %>
+<%- include("templates/head", { stylesheetPath: ['/styles/signup.css'] }) %>
 
 <div class="container">
-    <h1>Sign up</h1>
+    <h1>Sign Up</h1>
     <br>
     <form action='/signupSubmit' method='post'>
+        <label for="username">Username</label>
         <input name='username' type='text' placeholder='username' />
         <br>
         <br>
+        <label for="name">Name</label>
         <input name='name' type='text' placeholder='name' />
         <br>
         <br>
+        <label for="email">Email</label>
         <input name='email' type='email' placeholder='email' />
         <br>
         <br>
+        <label for="password">Password</label>
         <input name='password' type='password' placeholder='password' />
         <br>
         <br>
-        <label for="dob">DOB</label>
-        <br>
+        <label for="dob">Date of Birth</label>
         <input name='dob' type='date' placeholder='DOB' />
         <br>
         <br>
-        <button class="btn btn-success">Submit</button>
+        <button class="btn btn-success"><b>Submit</b></button>
     </form>
 </div>
 
