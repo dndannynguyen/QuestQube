@@ -1,7 +1,7 @@
 body {
     margin-top: 20px;
-    background-color: #f2f6fc;
-    color: #69707a;
+    background-color: #292929;
+    color: gold
 }
 
 .img-account-profile {
@@ -14,6 +14,7 @@ body {
 
 .card {
     box-shadow: 0 0.15rem 1.75rem 0 rgb(33 40 50 / 15%);
+    background-color: #be9e44;
 }
 
 .card .card-header {
@@ -75,7 +76,7 @@ a.list-group-item, .list-group-item-action {
     padding-bottom: 16px;
     -webkit-transition: all .3s;
     transition: all .3s;
-    border: 1px solid #e7e7e7 !important;
+    border: 1px solid #424242 !important;
     border-radius: 0 !important;
     color: #404040;
     font-size: 12px;
@@ -89,7 +90,7 @@ a.list-group-item, .list-group-item-action {
     display: block;
     padding: .75rem 1.25rem;
     margin-bottom: -1px;
-    background-color: #fff;
+    background-color: #d8c690;;
     border: 1px solid rgba(0,0,0,0.125);
 }
 
@@ -328,7 +329,7 @@ a.list-group-item, .list-group-item-action {
   position: relative;
   margin-bottom: 30px;
   padding: 0 50px 0 10px;
-  background-color: #fff;
+  background-color: #be9e44;
   box-shadow: 0 12px 20px 1px rgba(64, 64, 64, .09);
 }
 .cart-item .cart-item-label {
