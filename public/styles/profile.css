@@ -95,6 +95,7 @@ background-color: #d8c690;
 .img-account-profile {
     height: 10rem;
 }
+
 @media screen and (max-width: 768px){
     #dropdown {
             width: 80%;
@@ -119,4 +120,7 @@ background-color: #d8c690;
         button{
             margin-left: 40px;
         }
+             .list-group-item {
+                    width: 100%;          
+                }
 }
