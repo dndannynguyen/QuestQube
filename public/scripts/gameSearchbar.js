@@ -3,7 +3,9 @@ const setup = () => {
 }
 
 const convertToURLFormat = () => {
-  $('#game-search').val($('#game-search').val().replace(/[^\w\s-]/gi, '').replace(/\s+/g, '-').toLowerCase())
+  let gameName = $('#game-search').val().replace(/ - /g, '-'); // Replace " - " with "-"
+  gameName = gameName.replace(/[^\w\s-]/gi, '').replace(/\s+/g, '-').toLowerCase(); // Replace other special characters and spaces
+  $('#game-search').val(gameName);
 }
 
 const getGames = () => {
@@ -42,7 +44,7 @@ function autocomplete(inp, arr) {
         }
         b = document.createElement("DIV");
         b.innerHTML = arr[i].replace(new RegExp(val, "i"), "<strong>$&</strong>");
-        b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+        b.innerHTML += "<input type='hidden' value='" + arr[i].replace("'", "") + "'>";
         b.addEventListener("click", function (e) {
           inp.value = this.getElementsByTagName("input")[0].value;
           closeAllLists();
