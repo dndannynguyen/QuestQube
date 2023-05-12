@@ -135,6 +135,10 @@ app.post('/loginSubmit', async (req, res) => {
     }
 })
 
+app.get('/forgotPassword', async (req, res) => {
+    res.render('forgotPassword', { stylesheetPath: ['./styles/login.css'] })
+})
+
 app.get('/profile', async (req, res) => {
     const email = req.session.email;
     const result = await userModel.find({email: email});
