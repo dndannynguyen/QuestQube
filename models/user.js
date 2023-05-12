@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
     history: Array,
     dob: String,
     security_question: String,
-    security_answer: String
+    security_answer: String,
+    profilePic: String
 })
 
 const User = mongoose.model('users', userSchema)
