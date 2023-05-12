@@ -207,7 +207,7 @@ app.get('/saveImage', userAuthenticator, async (req, res) => {
     res.redirect('/profile');
   });
 
-app.get('/logout', (req, res) => {
+app.get('/logout', userAuthenticator, (req, res) => {
     req.session.destroy()
     res.redirect('/')
 })
