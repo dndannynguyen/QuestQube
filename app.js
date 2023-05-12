@@ -150,12 +150,22 @@ app.post('/securityQuestion', async (req, res) => {
 })
 
 app.post('/changePassword', async (req, res) => {
-    const security_question = req.body.security_question
+    const security_answer = req.body.security_answer
+    console.log(security_answer)
     const email = req.session.email
+    console.log(email)
     const user = await userCollection.findOne({ email: email })
-    if (security_question == user.security_question) {
+    console.log(user.security_answer)
+    if (bcrypt.compareSync(security_answer, user.security_answer)) {
         res.render('changePassword', { stylesheetPath: ['./styles/login.css'] })
     }
+})
+
+app.post('/updatePassword', async (req, res) => {
+    const password = req.body.new_password
+    const email = req.session.email
+    await userCollection.updateOne({ email: email }, { $set: { password: bcrypt.hashSync(password, 12) } })
+    res.redirect('/profile')
 })
 
 app.get('/profile', async (req, res) => {
