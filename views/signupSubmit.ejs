@@ -1,4 +1,4 @@
-<%- include("templates/head", { stylesheetPath: ['/styles/login.css'] }) %>
+<%- include("templates/head", { stylesheetPath: ['/styles/signupSubmit.css'] }) %>
 
 <div class="container">
     <% if (error == 'already exists') { %>
@@ -7,7 +7,7 @@
         <p class="mt-5">The following fields are required:</p>
         <% if (!name) %> <br>name
         <% if (!email) %> <br>email
-        <% if (!password) %> <br>password must contain at least: 
+        <% if (!password) %> <br>password must contain at least: <br><br>
         <ul>
             <li>8 characters</li>
             <li>1 uppercase letter</li>
