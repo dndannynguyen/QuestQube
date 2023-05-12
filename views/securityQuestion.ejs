@@ -1,0 +1,24 @@
+<%- include("templates/head", { stylesheetPath: ['/styles/login.css'] }) %>
+
+<div class="d-flex justify-content-center align-items-center vh-100">
+    <form method="POST" action="/checkQuestion">
+        <div class="card text-center" style="width: 300px;">
+            <div class="card-header h5 text-white bg-primary">Password Reset</div>
+            <div class="card-body px-5">
+                <p class="card-text py-2">
+                    <%= security_question %>
+                </p>
+                <div class="form-outline">
+                    <input type="email" name="security_answer" class="form-control my-3" />
+                </div>
+                <button class="btn btn-primary w-100" type="submit">Submit</button>
+                <div class="d-flex justify-content-between mt-4">
+                    <a class="" onclick="window.location.href='/login';">Login</a>
+                    <a class="" onclick="window.location.href='/signup';">Register</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<%- include("templates/foot") %>
