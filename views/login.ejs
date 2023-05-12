@@ -1,7 +1,7 @@
-<%- include("templates/head", { stylesheetPath: ['/styles/login.css'] }) %>
-
-<div class="container">
-    <h1><b>Login</b></h1>
+<%- include("templates/head", { stylesheetPath: ['/styles/login.css','/styles/nav.css','/styles/foot.css'] }) %>
+<%- include("templates/nav") %>
+<div class="login-form">
+    <h1>Login</h1>
     <br>
     <form method="POST" action="/loginSubmit">
         <input type="email" name="email" placeholder="email" />

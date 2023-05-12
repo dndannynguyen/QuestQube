@@ -1,7 +1,7 @@
-<%- include("templates/head", { stylesheetPath: ['/styles/signup.css'] }) %>
-
-<div class="container">
-    <h1>Sign Up</h1>
+<%- include("templates/head", { stylesheetPath: ['/styles/nav.css','/styles/foot.css'] }) %>
+<%- include("templates/nav") %>
+<div class="signup-form">
+    <h1>Sign up</h1>
     <br>
     <form action='/signupSubmit' method='post'>
         <label for="username">Username</label>
