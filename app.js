@@ -115,8 +115,10 @@ app.post('/signupSubmit', async (req, res) => {
 app.get('/login', (req, res) => {
     res.render('login', { stylesheetPath: ['/styles/login.css'] })
 })
+
 app.get("/", (req, res) => {
-  res.render("index" , { stylesheetPath: 'styles/index.css' });
+  const stylesheets = ["/styles/index.css", "/styles/foot.css"];
+  res.render("index", { stylesheets });
 });
 // LOGIN SUBMIT PAGE
 app.post('/loginSubmit', async (req, res) => {

@@ -117,3 +117,8 @@ nav.button a {
         height: 100%;
     }
 }
+@media screen and (max-width: 768px) {
+    .content{
+        padding-top: 10px
+    }
+}
