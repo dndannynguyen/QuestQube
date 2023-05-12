@@ -57,16 +57,20 @@ app.post('/signupSubmit', async (req, res) => {
         name: joi.string().required(),
         email: joi.string().email().required(),
         password: joi.string().required(),
-        dob: joi.string().required()
+        dob: joi.string().required(),
+        security_question: joi.string().required(),
+        security_answer: joi.string().required()
     })
     try {
-        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password, username: req.body.username, dob: req.body.dob })
-        const { username, name, email, password, dob } = req.body;
+        const validation = await schema.validateAsync({ name: req.body.name, email: req.body.email, password: req.body.password, username: req.body.username, dob: req.body.dob, security_question: req.body.security_question, security_answer: req.body.security_answer })
+        console.log('b')
+        const { username, name, email, password, dob, security_question, security_answer } = req.body;
         const result = await userModel.find({
             email: email
         })
+        console.log("a")
         if (result.length > 0) {
-            res.render('signupSubmit.ejs', { error: 'already exists' })
+            res.render('signupSubmit.ejs', { error: 'already exists', stylesheetPath: ['./styles/login.css'] } )
         } else {
             const user = new userModel({
                 username: username,
@@ -74,11 +78,15 @@ app.post('/signupSubmit', async (req, res) => {
                 email: email,
                 password: bcrypt.hashSync(password, 12),
                 type: 'user',
+                security_question: security_question,
+                security_answer: bcrypt.hashSync(security_answer, 12),
+                
                 wishlist: [],
                 favourites: [],
                 history: [],
                 dob: dob
             })
+            console.log(user)
             await user.save()
             req.session.GLOBAL_AUTHENTICATION = true
             req.session.name = name
