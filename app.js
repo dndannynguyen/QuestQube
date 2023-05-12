@@ -94,7 +94,8 @@ app.post('/signupSubmit', async (req, res) => {
                 wishlist: [],
                 favourites: [],
                 history: [],
-                dob: dob
+                dob: dob,
+                profilePic: null
             })
             console.log(user)
             await user.save()
@@ -184,8 +185,19 @@ app.get('/profile', async (req, res) => {
     const username = result[0].username;
     const name = result[0].name;
     const dob = result[0].dob;
-    res.render('profile', { username: username, name: name, email: email, dob: dob, stylesheetPath: './styles/profile.css' })
+    const profilePic = result[0].profilePic;
+    res.render('profile', { username: username, name: name, email: email, dob: dob, profilePic: profilePic, stylesheetPath: './styles/profile.css' })
 })
+
+app.get('/saveImage', async (req, res) => {
+    var selectedImage = req.query.selectedImage;
+    console.log(selectedImage);
+    const email = req.session.email;
+    console.log(email);
+    await userCollection.updateOne({ email: email }, { $set: { profilePic: `/mediaResources/Avatars/${selectedImage}.jpg` } });
+    res.redirect('/profile');
+  });
+  
 
 app.get('/logout', (req, res) => {
     req.session.destroy()
