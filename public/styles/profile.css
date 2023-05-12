@@ -84,3 +84,10 @@ padding: .75rem 1.25rem;
 margin-bottom: -1px;
 background-color: #d8c690;
 }
+
+.selected {
+    border: 5px solid green;
+}
+.img-account-profile {
+    height: 10rem;
+}
