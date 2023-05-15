@@ -320,7 +320,6 @@ app.post('/verifyFavourite', userAuthenticator, async (req, res) => {
 app.post('/removeFavourite', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const favourite = req.body.game;
-    console.log(favourite)
     await userCollection.updateOne({ email: email }, { $pull: {favourites: favourite} });
     res.redirect('/favourites')
 })
