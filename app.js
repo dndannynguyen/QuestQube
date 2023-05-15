@@ -7,6 +7,7 @@ const joi = require('joi')
 const app = express()
 require('dotenv').config();
 require("./utils.js");
+const verifyGame = require('./verifyGame.js');
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'));
@@ -294,21 +295,32 @@ app.get('/favourites', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const user = await userModel.findOne({ email: email });
     const profilePic = user.profilePic;
-    res.render('favourites', { stylesheetPath: ['/styles/favourites.css', '/styles/profile.css'], favourites: user.favourites, profilePic: profilePic })
+    const success = req.query.success;
+    res.render('favourites', { 
+        stylesheetPath: ['/styles/favourites.css', '/styles/profile.css'], 
+        favourites: user.favourites, 
+        profilePic: profilePic,
+        success: success })
 })
 
-// ADD FAVOURITE
-app.post('/addFavourite', userAuthenticator, async (req, res) => {
+// VERIFY FAVOURITE
+app.post('/verifyFavourite', userAuthenticator, async (req, res) => {
     const email = req.session.email;
-    const favourite = req.body.game;
-    await userCollection.updateOne({ email: email }, { $push: {favourites: favourite},  });
-    res.redirect('/favourites')
+    const game = req.body.game;
+    const result = await verifyGame(game);
+    if (result) {
+        await userCollection.updateOne({ email: email }, { $push: {favourites: result} });
+        res.redirect('/favourites?success=true')
+    } else {
+        res.redirect('/favourites?success=false')
+    }
 })
 
 // REMOVE FAVOURITE
 app.post('/removeFavourite', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const favourite = req.body.game;
+    console.log(favourite)
     await userCollection.updateOne({ email: email }, { $pull: {favourites: favourite} });
     res.redirect('/favourites')
 })

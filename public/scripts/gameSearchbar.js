@@ -2,12 +2,6 @@ const setup = () => {
   getGames()
 }
 
-const convertToURLFormat = () => {
-  let gameName = $('#game-search').val().replace(/ - /g, '-'); // Replace " - " with "-"
-  gameName = gameName.replace(/[^\w\s-]/gi, '').replace(/\s+/g, '-').toLowerCase(); // Replace other special characters and spaces
-  $('#game-search').val(gameName);
-}
-
 const getGames = () => {
   $.ajax({
     url: "/datasets/games_list.csv",
