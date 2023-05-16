@@ -8,6 +8,7 @@ const app = express()
 require('dotenv').config();
 require("./utils.js");
 const verifyGame = require('./verifyGame.js');
+const gpt = require('./gpt.js');
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'));
@@ -343,6 +344,12 @@ app.post('/removeFavourite', userAuthenticator, async (req, res) => {
     const profilePic = result[0].profilePic;
     const stylesheets = ['/styles/wishlist.css']
     res.render('wishlist', { wishlist: result[0].wishlist, profilePic: profilePic, stylesheetPath: stylesheets })
+})
+
+// RECOMMENDER PAGE
+app.get('/recommender', userAuthenticator, async (req, res) => {
+    const content = await gpt()
+    res.render('recommender', { content: content, stylesheetPath: ['./styles/recommender.css'] })
 })
 
 app.get("*", (req, res) => {
