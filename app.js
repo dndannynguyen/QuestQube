@@ -189,6 +189,19 @@ app.post('/updatePassword', async (req, res) => {
     res.redirect('/profile')
 })
 
+// USER SEARCH PAGE
+app.get('/user/', userAuthenticator, async (req, res) => {
+    const username = req.query.username;
+    const result = await userModel.find({username: username});
+    if (result.length > 0) {
+        const profilePic = result[0].profilePic;
+        const favourites = result[0].favourites;
+        res.render('user', { username: username, profilePic: profilePic, favourites: favourites, stylesheetPath: './styles/profile.css' })
+    } else {
+        res.redirect('/profile')
+    }
+})
+
 app.get('/profile', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const result = await userModel.find({email: email});
