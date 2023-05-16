@@ -3,14 +3,14 @@ const cheerio = require('cheerio');
 
 const verifyGame = async (game) => {
     const sluggedName = convertFormat(game);
-    const twitchResponse = await axios.post('https://id.twitch.tv/oauth2/token?client_id=td8hpht5c0jaqy2hpzuqfsurjsydxl&client_secret=edx96xqwexyw0l8uqad0w1r7zdj9q2&grant_type=client_credentials')
+    const twitchResponse = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.TWITCH_CLIENT_ID}&client_secret=${process.env.TWITCH_CLIENT_SECRET}&grant_type=client_credentials`)
     const access_token = twitchResponse.data.access_token;
     const igdbResponse = await axios.post(`https://api.igdb.com/v4/games/?fields=name,slug&limit=1&search=${game}&filter[category][eq]=0`, {
         fields: [],
         filters: `slug = "${sluggedName}"`
     }, {
         headers: {
-            'Client-ID': 'td8hpht5c0jaqy2hpzuqfsurjsydxl',
+            'Client-ID': `${process.env.TWITCH_CLIENT_ID}`,
             'Authorization': `Bearer ${access_token}`,
             'Accept': 'application/json'
         }
