@@ -55,13 +55,13 @@ const userAuthenticator = (req, res, next) => {
 }
 
 // SIGN UP PAGE
-app.get('/signup', (req,res) => {
+app.get('/signup', (req, res) => {
     res.render('signup', { stylesheetPath: ['./styles/login.css'] })
 });
 
 //PROMPT SCREEN
 app.get("/promptScreen", (req, res) => {
-  res.render("promptScreen", { stylesheetPath: ["./styles/promptScreen.css"] });
+    res.render("promptScreen", { stylesheetPath: ["./styles/promptScreen.css"] });
 });
 
 // SIGN UP SUBMIT PAGE
@@ -104,7 +104,7 @@ app.post('/signupSubmit', async (req, res) => {
                 type: 'user',
                 security_question: security_question,
                 security_answer: bcrypt.hashSync(security_answer, 12),
-                
+
                 wishlist: [],
                 favourites: [],
                 history: [],
@@ -131,8 +131,8 @@ app.get('/login', (req, res) => {
 })
 
 app.get("/", (req, res) => {
-  const stylesheets = ["/styles/index.css", "/styles/foot.css"];
-  res.render("index", { stylesheets });
+    const stylesheets = ["/styles/index.css", "/styles/foot.css"];
+    res.render("index", { stylesheets });
 });
 // LOGIN SUBMIT PAGE
 app.post('/loginSubmit', async (req, res) => {
@@ -150,7 +150,7 @@ app.post('/loginSubmit', async (req, res) => {
         } else if (bcrypt.compareSync(req.body.password, result[0].password)) {
             req.session.GLOBAL_AUTHENTICATION = true
             req.session.name = result[0].name
-            req.session.email= result[0].email
+            req.session.email = result[0].email
             req.session.type = result[0].type
             req.session.cookie.maxAge = expireTime
             res.redirect('/profile')
@@ -190,15 +190,20 @@ app.post('/changePassword', async (req, res) => {
 
 app.post('/updatePassword', async (req, res) => {
     const password = req.body.new_password
+    const confirm_password = req.body.confirm_new_password
     const email = req.session.email
-    await userCollection.updateOne({ email: email }, { $set: { password: bcrypt.hashSync(password, 12) } })
-    res.redirect('/profile')
+    if (password != confirm_password) {
+        res.render('updatePassword', { error: 'passwords do not match', stylesheetPath: ['./styles/login.css'] })
+    } else {
+        await userCollection.updateOne({ email: email }, { $set: { password: bcrypt.hashSync(password, 12) } })
+        res.redirect('/profile')
+    }
 })
 
 // USER SEARCH PAGE
 app.get('/user/', userAuthenticator, async (req, res) => {
     const username = req.query.username;
-    const result = await userModel.find({username: username});
+    const result = await userModel.find({ username: username });
     if (result.length > 0) {
         const profilePic = result[0].profilePic;
         const favourites = result[0].favourites;
@@ -210,7 +215,7 @@ app.get('/user/', userAuthenticator, async (req, res) => {
 
 app.get('/profile', userAuthenticator, async (req, res) => {
     const email = req.session.email;
-    const result = await userModel.find({email: email});
+    const result = await userModel.find({ email: email });
     const username = result[0].username;
     const name = result[0].name;
     const dob = result[0].dob;
@@ -225,7 +230,7 @@ app.get('/saveImage', userAuthenticator, async (req, res) => {
     console.log(email);
     await userCollection.updateOne({ email: email }, { $set: { profilePic: `/mediaResources/Avatars/${selectedImage}.jpg` } });
     res.redirect('/profile');
-  });
+});
 
 app.get('/logout', userAuthenticator, (req, res) => {
     req.session.destroy()
@@ -315,11 +320,12 @@ app.get('/favourites', userAuthenticator, async (req, res) => {
     const user = await userModel.findOne({ email: email });
     const profilePic = user.profilePic;
     const success = req.query.success;
-    res.render('favourites', { 
-        stylesheetPath: ['/styles/favourites.css', '/styles/profile.css'], 
-        favourites: user.favourites, 
+    res.render('favourites', {
+        stylesheetPath: ['/styles/favourites.css', '/styles/profile.css'],
+        favourites: user.favourites,
         profilePic: profilePic,
-        success: success })
+        success: success
+    })
 })
 
 // VERIFY FAVOURITE
@@ -328,7 +334,7 @@ app.post('/verifyFavourite', userAuthenticator, async (req, res) => {
     const game = req.body.game;
     const result = await verifyGame(game);
     if (result) {
-        await userCollection.updateOne({ email: email }, { $push: {favourites: result} });
+        await userCollection.updateOne({ email: email }, { $push: { favourites: result } });
         res.redirect('/favourites?success=true')
     } else {
         res.redirect('/favourites?success=false')
@@ -339,13 +345,13 @@ app.post('/verifyFavourite', userAuthenticator, async (req, res) => {
 app.post('/removeFavourite', userAuthenticator, async (req, res) => {
     const email = req.session.email;
     const favourite = req.body.game;
-    await userCollection.updateOne({ email: email }, { $pull: {favourites: favourite} });
+    await userCollection.updateOne({ email: email }, { $pull: { favourites: favourite } });
     res.redirect('/favourites')
 })
 
-  app.get('/wishlist', userAuthenticator, async (req, res) => {
+app.get('/wishlist', userAuthenticator, async (req, res) => {
     const email = req.session.email;
-    const result = await userModel.find({email: email});
+    const result = await userModel.find({ email: email });
     const profilePic = result[0].profilePic;
     const stylesheets = ['/styles/wishlist.css']
     res.render('wishlist', { wishlist: result[0].wishlist, profilePic: profilePic, stylesheetPath: stylesheets })
@@ -358,8 +364,8 @@ app.get('/recommender', userAuthenticator, async (req, res) => {
 })
 
 app.get("*", (req, res) => {
-  res.status(404);
-  res.render("404");
+    res.status(404);
+    res.render("404");
 });
 
 module.exports = app
