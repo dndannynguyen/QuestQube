@@ -9,6 +9,10 @@ require('dotenv').config();
 require("./utils.js");
 const verifyGame = require('./verifyGame.js');
 const gpt = require('./gpt.js');
+const B2 = require('backblaze-b2');
+const fs = require('fs');
+const multer = require('multer');
+const { PassThrough } = require('stream');
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'));
@@ -21,16 +25,39 @@ const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_database = process.env.MONGODB_DATABASE;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 const node_session_secret = process.env.NODE_SESSION_SECRET;
+backblaze_account = process.env.BACKBLAZE_ACCOUNT_ID;
+backblaze_API = process.env.BACKBLAZE_APPLICATION_KEY;
+backblaze_bucket = process.env.BACKBLAZE_BUCKET_ID;
 
 var {
     database
 } = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
+const multerStorage = multer.memoryStorage();
+const upload = multer({ storage: multerStorage });
 
 app.use(express.urlencoded({
     extended: false
 }));
+
+const b2 = new B2({
+    applicationKeyId: backblaze_account,
+    applicationKey: backblaze_API
+  });
+
+  async function GetBucket() {
+    try {
+      await b2.authorize(); // must authorize first (authorization lasts 24 hrs)
+      let response = await b2.getBucket({ bucketName: backblaze_bucket });
+      console.log(response.data);
+      console.log("success")
+    } catch (err) {
+      console.log('Error getting bucket:', err);
+    }
+  }
+
+  GetBucket();
 
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
