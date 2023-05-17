@@ -207,7 +207,8 @@ app.get('/user/', userAuthenticator, async (req, res) => {
     if (result.length > 0) {
         const profilePic = result[0].profilePic;
         const favourites = result[0].favourites;
-        res.render('user', { username: username, profilePic: profilePic, favourites: favourites, stylesheetPath: './styles/profile.css' })
+        const wishlist = result[0].wishlist;
+        res.render('user', { username: username, profilePic: profilePic, favourites: favourites, wishlist: wishlist, stylesheetPath: './styles/profile.css' })
     } else {
         res.redirect('/profile')
     }
@@ -349,13 +350,41 @@ app.post('/removeFavourite', userAuthenticator, async (req, res) => {
     res.redirect('/favourites')
 })
 
+//WISHLIST PAGE
 app.get('/wishlist', userAuthenticator, async (req, res) => {
     const email = req.session.email;
-    const result = await userModel.find({ email: email });
-    const profilePic = result[0].profilePic;
-    const stylesheets = ['/styles/wishlist.css']
-    res.render('wishlist', { wishlist: result[0].wishlist, profilePic: profilePic, stylesheetPath: stylesheets })
+    const user = await userModel.findOne({ email: email });
+    const profilePic = user.profilePic;
+    const success = req.query.success;
+    res.render('wishlist', {
+        stylesheetPath: ['/styles/wishlist.css', '/styles/profile.css'],
+        wishlist: user.wishlist,
+        profilePic: profilePic,
+        success: success
+    })
 })
+
+// VERIFY WISHLIST
+app.post('/verifyWishlist', userAuthenticator, async (req, res) => {
+    const email = req.session.email;
+    const game = req.body.game;
+    const result = await verifyGame(game);
+    if (result) {
+        await userCollection.updateOne({ email: email }, { $push: { wishlist: result } });
+        res.redirect('/wishlist?success=true')
+    } else {
+        res.redirect('/wishlist?success=false')
+    }
+})
+
+// REMOVE WISHLIST
+app.post('/removeWishlist', userAuthenticator, async (req, res) => {
+    const email = req.session.email;
+    const wishlist = req.body.game;
+    await userCollection.updateOne({ email: email }, { $pull: { wishlist: wishlist } });
+    res.redirect('/wishlist')
+})
+
 
 // RECOMMENDER PAGE
 app.get('/recommender', userAuthenticator, async (req, res) => {

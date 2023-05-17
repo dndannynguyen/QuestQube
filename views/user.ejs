@@ -1,4 +1,5 @@
-<%- include("templates/head", { stylesheetPath:['/styles/favourites.css', '/styles/profile.css','/styles/nav.css','/styles/foot.css'] }) %>
+<%- include("templates/head", { stylesheetPath:['/styles/favourites.css', '/styles/profile.css'
+    ,'/styles/nav.css','/styles/foot.css'] }) %>
     <%- include("templates/nav") %>
         <script src="/scripts/profileSwapper.js"></script>
         <div class="profile-container mt-5 .col-xs">
@@ -84,7 +85,30 @@
                         </h1>
                     </div>
                 </div>
+
                 <!-- user Wishlist -->
+                <div id="user-wishlist" class="col-lg-8 pb-5" style="display: none;">
+                    <script src="/scripts/scrapeImages.js"></script>
+                    <div id="wishlist-container">
+                        <h1 class="mb-4">Wishlist Games</h1>
+                        <div class="wishlist">
+                            <br>
+                            <div class="row">
+                                <% for (var j=0; j < wishlist.length; j++) { %>
+                                    <div class="col-md-4" style="margin-top: 15px;">
+                                        <div class="card mb-4">
+                                            <img id="game-image-<%= j %>" src="" alt="" class="card-img-top">
+                                        </div>
+                                    </div>
+                                    <script>
+                                        scrapeImages('<%= wishlist[j] %>', 'game-image-<%= j %>');
+                                    </script>
+                                    <% } %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- User Favourites -->
                 <div id="user-favourites" class="col-lg-8 pb-5" style="display: none;">
                     <script src="/scripts/scrapeImages.js"></script>
@@ -96,11 +120,11 @@
                                 <% for (var i=0; i < favourites.length; i++) { %>
                                     <div class="col-md-4" style="margin-top: 15px;">
                                         <div class="card mb-4">
-                                            <img id="game-image-<%= i %>" src="" alt="" class="card-img-top">
+                                            <img id="game-image-<%= j+i %>" src="" alt="" class="card-img-top">
                                         </div>
                                     </div>
                                     <script>
-                                        scrapeImages('<%= favourites[i] %>', 'game-image-<%= i %>');
+                                        scrapeImages('<%= favourites[i] %>', 'game-image-<%= j+i %>');
                                     </script>
                                     <% } %>
                             </div>
