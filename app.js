@@ -59,6 +59,11 @@ app.get('/signup', (req,res) => {
     res.render('signup', { stylesheetPath: ['./styles/login.css'] })
 });
 
+//PROMPT SCREEN
+app.get("/promptScreen", (req, res) => {
+  res.render("promptScreen", { stylesheetPath: ["./styles/promptScreen.css"] });
+});
+
 // SIGN UP SUBMIT PAGE
 app.post('/signupSubmit', async (req, res) => {
     const schema = joi.object({
