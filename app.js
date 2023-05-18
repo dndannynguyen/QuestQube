@@ -315,12 +315,9 @@ app.get('/profile', userAuthenticator, async (req, res) => {
       // Get the bucket information
       let response = await b2.getBucket({ bucketName: backblaze_name });
       const bucketInfo = response.data;
-      console.log(bucketInfo);
   
       const profilePicFileName = `${email}/Profile_Picture.jpg`;
-      console.log('Profile picture file name:', profilePicFileName);
-      const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}`;
-      console.log('Profile picture URL:', profilePicUrl)
+      const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}?${Date.now()}`;
   
       res.render('profile', { username, name, email, dob, profilePic: profilePicUrl, stylesheetPath: './styles/profile.css' });
     } catch (error) {
@@ -330,7 +327,7 @@ app.get('/profile', userAuthenticator, async (req, res) => {
   });
   
 
-app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (req, res) => {
+  app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (req, res) => {
     const email = req.session.email;
   
     // Configure your Backblaze B2 settings
@@ -345,12 +342,9 @@ app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (re
   
       // Get the bucket information
       let response = await b2.getBucket({ bucketName: backblaze_name });
-      console.log(response.data);
-      console.log("Success! Backblaze server is connected.");
   
       // Read the uploaded image file from the saved path on the file system
       const fileData = fs.readFileSync(req.file.path);
-      console.log(fileData);
   
       // Calculate the SHA1 hash of the file content
       const contentSha1 = crypto.createHash('sha1').update(fileData).digest('hex');
@@ -358,15 +352,13 @@ app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (re
       // Define the folder name as the user's ID
       const folderName = `${email}`;
   
-      // Define the file name as "Profile Picture"
+      // Define the file name as "Profile_Picture.jpg"
       const fileName = `${folderName}/Profile_Picture.jpg`;
   
       // Get the upload URL and authorization token
       const uploadUrlResponse = await b2.getUploadUrl({ bucketId: backblaze_bucket });
       const uploadUrl = uploadUrlResponse.data.uploadUrl;
       const uploadAuthToken = uploadUrlResponse.data.authorizationToken;
-      console.log('Got an upload URL:', uploadUrl);
-      console.log('Got an upload auth token:', uploadAuthToken);
   
       // Upload the file to Backblaze B2
       await b2.uploadFile({
@@ -382,17 +374,31 @@ app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (re
       // Delete the uploaded file from the local filesystem
       fs.unlinkSync(req.file.path);
   
-      // Update the user's profilePic field in the database
+      // Retrieve the current profile picture file path from the user document
+      const user = await userModel.findOne({ email });
+      const currentProfilePic = user.profilePic;
+  
+      // Check if the current profile picture file path exists and is different from the new file path
+      if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
+        // Extract the file name from the current profile picture file path
+        const currentFileName = currentProfilePic.substring(1);
+  
+        // Delete the old profile picture file from Backblaze B2
+        await b2.deleteFileVersion({ bucketId: backblaze_bucket, fileName: currentFileName });
+        console.log('Old profile picture file deleted:', currentFileName);
+      }
+  
+      // Update the user's profilePic field in the database with the new file path
       await userCollection.updateOne({ email }, { $set: { profilePic: `/${fileName}` } });
   
       // Redirect to the profile page or display a success message
       res.redirect('/profile');
-    } catch (error) {
+      } catch (error) {
       console.error('Error uploading image:', error);
       // Handle the error accordingly
       // res.redirect('/profile'); // Redirect to the profile page or display an error message
-    }
-  });
+      }
+      });  
   
   
 
