@@ -59,6 +59,13 @@ app.get('/signup', (req, res) => {
     res.render('signup', { stylesheetPath: ['./styles/login.css'] })
 });
 
+//INITIAL RECOMMENDER SCREEN
+app.get("/initialRecommend", (req, res) => {
+  res.render("initialRecommend", {
+    stylesheetPath: ["./styles/initialRecommend.css"],
+  });
+});
+
 //PROMPT SCREEN
 app.get("/promptScreen", (req, res) => {
     res.render("promptScreen", { stylesheetPath: ["./styles/promptScreen.css"] });
