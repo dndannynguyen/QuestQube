@@ -8,6 +8,7 @@ const app = express()
 const crypto = require('crypto');
 require('dotenv').config();
 require("./utils.js");
+const prompts = require('./prompts.js');
 const verifyGame = require('./verifyGame.js');
 const gpt = require('./gpt.js');
 const B2 = require('backblaze-b2');
@@ -572,7 +573,13 @@ app.post('/removeWishlist', userAuthenticator, async (req, res) => {
 
 // RECOMMENDER PAGE
 app.get('/recommender', userAuthenticator, async (req, res) => {
-    const content = await gpt()
+    const messageOne = prompts.systemMessage1
+    console.log(messageOne) 
+    // const content = await gpt(message)
+    // const content = await gpt(messageOne)
+
+    const options = content.split(/#\d+\s+/).filter(option => option !== ""); // Regular expression pattern to match any digit followed by a dot and a space
+    console.log(options)
     res.render('recommender', { content: content, stylesheetPath: ['./styles/recommender.css'] })
 })
 

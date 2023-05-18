@@ -22,17 +22,14 @@ const createChatCompletion = async (messages, options = {}) => {
     }
 }
 
-const gpt = async () => {
-    const messages = [
-        { role: "user", content: "Write the beginning of a two sentence action story. Finish by giving the user 3 potential options that could continue the story. Options should be less than 4 words. One of the options should include the keyword 'sword' Write this story in the 'you' perspective." },
-    ];
+const gpt = async (message) => {
 
     const options = {
         temperature: 0.8,
-        max_tokens: 50,
+        max_tokens: 150,
     };
 
-    const choices = await createChatCompletion(messages, options);
+    const choices = await createChatCompletion(message, options);
 
     return choices[0].message.content;
 }
