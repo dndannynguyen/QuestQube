@@ -100,24 +100,5 @@
             </div>
         </div>
     </div>
-    <script>
-        $(document).ready(function() {
-            $('.img-account-profile').click(function() {
-                // Remove 'selected' class from all images
-                $('.img-account-profile').removeClass('selected');
-    
-                // Add 'selected' class to the clicked image
-                $(this).addClass('selected');
-            });
-    
-            $('#saveChangesButton').click(function() {
-                var selectedImage = $('.img-account-profile.selected').attr('value');
-                // Perform any necessary AJAX request or form submission to save the selected image value
-                // Redirect to the desired route, e.g., using window.location.href
-                window.location.href = '/saveImage?selectedImage=' + selectedImage;
-            });
-        });
-    </script>
-    
     
     <%- include("templates/foot") %>
