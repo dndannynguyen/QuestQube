@@ -36,7 +36,18 @@ var {
 } = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
-const multerStorage = multer.memoryStorage();
+
+const multerStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      // Specify the destination folder where the uploaded file will be saved
+      cb(null, 'uploads');
+    },
+    filename: (req, file, cb) => {
+      // Generate a unique filename for the uploaded file
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix);
+    }
+  });
 const upload = multer({ storage: multerStorage });
 
 app.use(express.urlencoded({
@@ -48,58 +59,58 @@ const b2 = new B2({
     applicationKey: backblaze_API
   });
 
-  async function GetBucketAndUploadPhoto() {
-    try {
-      await b2.authorize();
-      let response = await b2.getBucket({ bucketName: backblaze_name });
-      console.log(response.data);
-      console.log("Success! Backblaze server is connected.");
+//   async function GetBucketAndUploadPhoto() {
+//     try {
+//       await b2.authorize();
+//       let response = await b2.getBucket({ bucketName: backblaze_name });
+//       console.log(response.data);
+//       console.log("Success! Backblaze server is connected.");
   
-      // Define the folder name
-      const folderName = 'user';
+//       // Define the folder name
+//       const folderName = 'user';
   
-      // Upload a photo to the bucket in the specified folder
-      const photoPath = 'C:/Users/marti/Documents/2800-202310-DTC10/public/mediaResources/avatars/1.jpg';
-      const fileName = folderName + '/uploaded-photo.jpg';
+//       // Upload a photo to the bucket in the specified folder
+//       const photoPath = 'C:/Users/marti/Documents/2800-202310-DTC10/public/mediaResources/avatars/1.jpg';
+//       const fileName = folderName + '/uploaded-photo.jpg';
   
-      fs.readFile(photoPath, async (err, fileData) => {
-        if (err) {
-          console.log('Error reading photo:', err);
-          return;
-        }
+//       fs.readFile(photoPath, async (err, fileData) => {
+//         if (err) {
+//           console.log('Error reading photo:', err);
+//           return;
+//         }
   
-        try {
-          const uploadUrlResponse = await b2.getUploadUrl({ bucketId: backblaze_bucket });
-          const uploadUrl = uploadUrlResponse.data.uploadUrl;
-          const uploadAuthToken = uploadUrlResponse.data.authorizationToken;
-          console.log('Got an upload URL:', uploadUrl);
-          console.log('Got an upload auth token:', uploadAuthToken);
+//         try {
+//           const uploadUrlResponse = await b2.getUploadUrl({ bucketId: backblaze_bucket });
+//           const uploadUrl = uploadUrlResponse.data.uploadUrl;
+//           const uploadAuthToken = uploadUrlResponse.data.authorizationToken;
+//           console.log('Got an upload URL:', uploadUrl);
+//           console.log('Got an upload auth token:', uploadAuthToken);
 
-          // Calculate the SHA1 hash of the file content
-        const contentSha1 = crypto.createHash('sha1').update(fileData).digest('hex');
+//           // Calculate the SHA1 hash of the file content
+//         const contentSha1 = crypto.createHash('sha1').update(fileData).digest('hex');
   
-          // Call the uploadFile method with the obtained upload URL and auth token
-          await b2.uploadFile({
-            uploadUrl: uploadUrl,
-            uploadAuthToken: uploadAuthToken,
-            fileName: fileName,
-            data: fileData,
-            bucketName: backblaze_name,
-            contentSha1: contentSha1
-          });
-          console.log('Photo uploaded successfully:', fileName);
+//           // Call the uploadFile method with the obtained upload URL and auth token
+//           await b2.uploadFile({
+//             uploadUrl: uploadUrl,
+//             uploadAuthToken: uploadAuthToken,
+//             fileName: fileName,
+//             data: fileData,
+//             bucketName: backblaze_name,
+//             contentSha1: contentSha1
+//           });
+//           console.log('Photo uploaded successfully:', fileName);
   
-        } catch (error) {
-          console.error('Error uploading photo:', error);
-        }
-      });
-    } catch (err) {
-      console.log('Error getting bucket:', err);
-    }
-  }
+//         } catch (error) {
+//           console.error('Error uploading photo:', error);
+//         }
+//       });
+//     } catch (err) {
+//       console.log('Error getting bucket:', err);
+//     }
+//   }
   
-  // Call the function to get the bucket and upload the photo when the page loads
-  GetBucketAndUploadPhoto();
+//   // Call the function to get the bucket and upload the photo when the page loads
+//   GetBucketAndUploadPhoto();
 
 
 var mongoStore = MongoStore.create({
@@ -293,14 +304,71 @@ app.get('/profile', userAuthenticator, async (req, res) => {
     res.render('profile', { username: username, name: name, email: email, dob: dob, profilePic: profilePic, stylesheetPath: './styles/profile.css' })
 })
 
-app.get('/saveImage', userAuthenticator, async (req, res) => {
-    var selectedImage = req.query.selectedImage;
-    console.log(selectedImage);
+app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (req, res) => {
     const email = req.session.email;
-    console.log(email);
-    await userCollection.updateOne({ email: email }, { $set: { profilePic: `/mediaResources/Avatars/${selectedImage}.jpg` } });
-    res.redirect('/profile');
-});
+  
+    // Configure your Backblaze B2 settings
+    const b2 = new B2({
+      applicationKeyId: backblaze_account,
+      applicationKey: backblaze_API
+    });
+  
+    try {
+      // Authorize with Backblaze B2
+      await b2.authorize();
+  
+      // Get the bucket information
+      let response = await b2.getBucket({ bucketName: backblaze_name });
+      console.log(response.data);
+      console.log("Success! Backblaze server is connected.");
+  
+      // Read the uploaded image file from the saved path on the file system
+      const fileData = fs.readFileSync(req.file.path);
+      console.log(fileData);
+  
+      // Calculate the SHA1 hash of the file content
+      const contentSha1 = crypto.createHash('sha1').update(fileData).digest('hex');
+  
+      // Define the folder name as the user's ID
+      const folderName = `${email}`;
+  
+      // Define the file name as "Profile Picture"
+      const fileName = `${folderName}/Profile Picture.jpg`;
+  
+      // Get the upload URL and authorization token
+      const uploadUrlResponse = await b2.getUploadUrl({ bucketId: backblaze_bucket });
+      const uploadUrl = uploadUrlResponse.data.uploadUrl;
+      const uploadAuthToken = uploadUrlResponse.data.authorizationToken;
+      console.log('Got an upload URL:', uploadUrl);
+      console.log('Got an upload auth token:', uploadAuthToken);
+  
+      // Upload the file to Backblaze B2
+      await b2.uploadFile({
+        uploadUrl: uploadUrl,
+        uploadAuthToken: uploadAuthToken,
+        fileName: fileName,
+        data: fileData,
+        bucketName: backblaze_name,
+        contentSha1: contentSha1
+      });
+      console.log('Photo uploaded successfully:', fileName);
+  
+      // Delete the uploaded file from the local filesystem
+      fs.unlinkSync(req.file.path);
+  
+      // Update the user's profilePic field in the database
+    //   await userCollection.updateOne({ email }, { $set: { profilePic: `/${fileName}` } });
+  
+      // Redirect to the profile page or display a success message
+      res.redirect('/profile');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      // Handle the error accordingly
+      // res.redirect('/profile'); // Redirect to the profile page or display an error message
+    }
+  });
+  
+  
 
 app.get('/logout', userAuthenticator, (req, res) => {
     req.session.destroy()
