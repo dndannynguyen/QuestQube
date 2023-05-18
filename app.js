@@ -66,6 +66,13 @@ app.get("/initialRecommend", (req, res) => {
   });
 });
 
+//FINAL RECOMMENDER SCREEN
+app.get("/finalRecommend", (req, res) => {
+  res.render("finalRecommend", {
+    stylesheetPath: ["./styles/finalRecommend.css"],
+  });
+});
+
 //PROMPT SCREEN
 app.get("/promptScreen", (req, res) => {
     res.render("promptScreen", { stylesheetPath: ["./styles/promptScreen.css"] });
