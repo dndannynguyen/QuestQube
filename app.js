@@ -136,6 +136,14 @@ const userAuthenticator = (req, res, next) => {
     next()
 }
 
+// RECOMMENDER MIDDLEWARE
+const recommenderAuthenticator = (req, res, next) => {
+    if (req.session.count == null) {
+        return res.redirect('/initialRecommend')
+    }
+    next()
+}
+
 // SIGN UP PAGE
 app.get('/signup', (req, res) => {
     res.render('signup', { stylesheetPath: ['./styles/login.css'] })
@@ -143,6 +151,7 @@ app.get('/signup', (req, res) => {
 
 //INITIAL RECOMMENDER SCREEN
 app.get("/initialRecommend", (req, res) => {
+    req.session.count = 0;
   res.render("initialRecommend", {
     stylesheetPath: ["./styles/initialRecommend.css"],
   });
@@ -570,17 +579,23 @@ app.post('/removeWishlist', userAuthenticator, async (req, res) => {
     res.redirect('/wishlist')
 })
 
-
 // RECOMMENDER PAGE
-app.get('/recommender', userAuthenticator, async (req, res) => {
+app.get('/recommender', userAuthenticator, recommenderAuthenticator, async (req, res) => {
     const messageOne = prompts.systemMessage1
-    console.log(messageOne) 
-    // const content = await gpt(message)
     // const content = await gpt(messageOne)
-
+    const content = "This is a test. #1 annsssaflsalm #2 akngkjnfkasnfa #3 kasnvkjanvka #4 kasnjlkasnfkas #5 asjnsalflkasf"
     const options = content.split(/#\d+\s+/).filter(option => option !== ""); // Regular expression pattern to match any digit followed by a dot and a space
     console.log(options)
-    res.render('recommender', { content: content, stylesheetPath: ['./styles/recommender.css'] })
+    const question = options[0];
+    console.log(question)
+    res.render('promptScreen', { options: options, stylesheetPath: ['./styles/promptScreen.css'] })
+})
+
+app.get('/optionProcess', userAuthenticator, async (req, res) => {
+    const answer = req.body.answer;
+    const answers = [];
+    answers.push(answer);
+    
 })
 
 app.get("*", (req, res) => {
