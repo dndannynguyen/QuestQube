@@ -301,8 +301,34 @@ app.get('/profile', userAuthenticator, async (req, res) => {
     const name = result[0].name;
     const dob = result[0].dob;
     const profilePic = result[0].profilePic;
-    res.render('profile', { username: username, name: name, email: email, dob: dob, profilePic: profilePic, stylesheetPath: './styles/profile.css' })
-})
+  
+    // Connect to Backblaze B2 storage
+    const b2 = new B2({
+      applicationKeyId: backblaze_account,
+      applicationKey: backblaze_API
+    });
+  
+    try {
+      // Authorize with Backblaze B2
+      await b2.authorize();
+  
+      // Get the bucket information
+      let response = await b2.getBucket({ bucketName: backblaze_name });
+      const bucketInfo = response.data;
+      console.log(bucketInfo);
+  
+      const profilePicFileName = `${email}/Profile_Picture.jpg`;
+      console.log('Profile picture file name:', profilePicFileName);
+      const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}`;
+      console.log('Profile picture URL:', profilePicUrl)
+  
+      res.render('profile', { username, name, email, dob, profilePic: profilePicUrl, stylesheetPath: './styles/profile.css' });
+    } catch (error) {
+      console.error('Error connecting to Backblaze:', error);
+      res.render('profile', { username, name, email, dob, profilePic, stylesheetPath: './styles/profile.css' });
+    }
+  });
+  
 
 app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (req, res) => {
     const email = req.session.email;
@@ -333,7 +359,7 @@ app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (re
       const folderName = `${email}`;
   
       // Define the file name as "Profile Picture"
-      const fileName = `${folderName}/Profile Picture.jpg`;
+      const fileName = `${folderName}/Profile_Picture.jpg`;
   
       // Get the upload URL and authorization token
       const uploadUrlResponse = await b2.getUploadUrl({ bucketId: backblaze_bucket });
@@ -357,7 +383,7 @@ app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (re
       fs.unlinkSync(req.file.path);
   
       // Update the user's profilePic field in the database
-    //   await userCollection.updateOne({ email }, { $set: { profilePic: `/${fileName}` } });
+      await userCollection.updateOne({ email }, { $set: { profilePic: `/${fileName}` } });
   
       // Redirect to the profile page or display a success message
       res.redirect('/profile');
