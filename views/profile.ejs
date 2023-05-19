@@ -31,11 +31,12 @@
           </div>
         </div>
         <div class="col-md-6">
-          <div class="form-group">
-            <label for="account-pass">New Password</label>
-            <input class="form-control" type="password" name="newPassword" id="newPassword" placeholder="Enter New Password">
+            <div class="form-group">
+              <label for="account-pass">New Password</label>
+              <input class="form-control" type="password" name="newPassword" id="newPassword" placeholder="Enter New Password">
+              <div id="passwordRequirements" class="password-requirements"></div>
+            </div>
           </div>
-        </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="account-confirm-pass">Confirm Password</label>
@@ -108,30 +109,113 @@
       var confirmPassword = document.getElementById("confirmPassword");
       var passwordMatchError = document.getElementById("passwordMatchError");
       var updateProfileButton = document.getElementById("updateProfileButton");
-  
-      if (newPassword.value !== null && confirmPassword.value !== null) {
+      var passwordRequirements = document.getElementById("passwordRequirements");
+    
+      // Regular expressions for each password requirement
+      var uppercaseRegex = /[A-Z]/;
+      var lowercaseRegex = /[a-z]/;
+      var numberRegex = /[0-9]/;
+      var specialCharRegex = /[!@#$%^&*]/;
+      var minLength = 8;
+    
+      // Check each requirement and display the corresponding icon
+      var checkmarks = [];
+      var crosses = [];
+      if (uppercaseRegex.test(newPassword.value)) {
+        checkmarks.push("Uppercase letter");
+      } else {
+        crosses.push("Uppercase letter");
+      }
+      if (lowercaseRegex.test(newPassword.value)) {
+        checkmarks.push("Lowercase letter");
+      } else {
+        crosses.push("Lowercase letter");
+      }
+      if (numberRegex.test(newPassword.value)) {
+        checkmarks.push("Number");
+      } else {
+        crosses.push("Number");
+      }
+      if (specialCharRegex.test(newPassword.value)) {
+        checkmarks.push("Special character");
+      } else {
+        crosses.push("Special character");
+      }
+      if (newPassword.value.length >= minLength) {
+        checkmarks.push("Minimum " + minLength + " characters");
+      } else {
+        crosses.push("Minimum " + minLength + " characters");
+      }
+    
+      // Update the password requirements text with checkmarks and crosses
+      var requirementsText = "";
+      if (checkmarks.length > 0 || crosses.length > 0) {
+        requirementsText += "<ul>";
+        checkmarks.forEach(function (requirement) {
+          requirementsText += "<li>&#10003; " + requirement + "</li>";
+        });
+        crosses.forEach(function (requirement) {
+          requirementsText += "<li style='color: red;'>&#10005; " + requirement + "</li>";
+        });
+        requirementsText += "</ul>";
+      }
+      passwordRequirements.innerHTML = requirementsText;
+    
+      // Check if passwords match and enable/disable the button
+      if (newPassword.value !== "" || confirmPassword.value !== "") {
         if (newPassword.value !== confirmPassword.value) {
           passwordMatchError.style.display = "block";
+          updateProfileButton.disabled = true;
+        } else if (crosses.length > 0) {
+          passwordMatchError.style.display = "none";
           updateProfileButton.disabled = true;
         } else {
           passwordMatchError.style.display = "none";
           updateProfileButton.disabled = false;
         }
-  
-        if (newPassword.value === "" && confirmPassword.value === "") {
-          updateProfileButton.disabled = false;
-        }
+      } else {
+        passwordMatchError.style.display = "none";
+        updateProfileButton.disabled = false;
       }
     }
-  
+    
     // Event listener for password inputs
     var passwordInputs = document.querySelectorAll("input[type='password']");
-    passwordInputs.forEach(function(input) {
+    passwordInputs.forEach(function (input) {
       input.addEventListener("input", checkPasswordMatch);
     });
-  
+    
+    // Show password requirements pop-up on input field click
+    var newPasswordInput = document.getElementById("newPassword");
+    var confirmPasswordInput = document.getElementById("confirmPassword");
+    var passwordMatchError = document.getElementById("passwordMatchError");
+    
+    newPasswordInput.addEventListener("input", function () {
+      passwordRequirements.style.display = "block";
+    });
+    
+    newPasswordInput.addEventListener("blur", function () {
+      if (newPasswordInput.value === "") {
+        passwordRequirements.style.display = "none";
+      }
+    });
+    
+    confirmPasswordInput.addEventListener("blur", function () {
+      if (newPasswordInput.value !== confirmPasswordInput.value) {
+        passwordMatchError.style.display = "block";
+      } else {
+        passwordMatchError.style.display = "none";
+      }
+    });
+    
     // Call the function when the page loads
-    window.addEventListener("load", checkPasswordMatch);
-  </script>
+    window.addEventListener("load", function () {
+      checkPasswordMatch();
+      passwordRequirements.style.display = "none";
+      passwordMatchError.style.display = "none";
+    });
+    
+    </script>
+    
 
 <%- include("templates/foot") %>

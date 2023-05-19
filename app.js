@@ -356,8 +356,6 @@ app.get('/profile', userAuthenticator, async (req, res) => {
       // res.redirect('/profile'); // Redirect to the profile page or display an error message
       }
       });  
-  
-  
 
 app.get('/logout', userAuthenticator, (req, res) => {
     req.session.destroy()
