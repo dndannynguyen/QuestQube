@@ -3,7 +3,11 @@
 include("templates/nav") %>
 <div class="content">
       <div class="picture">
-        <img src="mediaResources/1.jpg" alt="" />
+        <% if (count == 1) { %>
+          <img src="mediaResources/guild.jpg" alt="" />
+        <% } else if (count == 2) { %>
+          <img src="mediaResources/city.jpg" alt="" />
+        <% } %>
       </div>
       <div class="prompt-card">
         <div class="prompt">

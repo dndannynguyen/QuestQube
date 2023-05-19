@@ -762,7 +762,8 @@ app.get(
     );
     res.render("promptScreen", {
       options: options,
-      stylesheetPath: ["./styles/promptScreen.css"],
+      count: req.session.count,
+      stylesheetPath: ["./styles/promptScreen.css", ],
     });
   }
 );
