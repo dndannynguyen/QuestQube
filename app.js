@@ -134,6 +134,7 @@ app.get("/", (req, res) => {
     const stylesheets = ["/styles/index.css", "/styles/foot.css"];
     res.render("index", { stylesheets });
 });
+
 // LOGIN SUBMIT PAGE
 app.post('/loginSubmit', async (req, res) => {
     const schema = joi.object({
@@ -223,6 +224,19 @@ app.get('/profile', userAuthenticator, async (req, res) => {
     const profilePic = result[0].profilePic;
     res.render('profile', { username: username, name: name, email: email, dob: dob, profilePic: profilePic, stylesheetPath: './styles/profile.css' })
 })
+
+//COMMUNITY FORUM PAGE
+app.get('/community', userAuthenticator, async (req, res) => {
+    const email = req.session.email;
+    const result = await userModel.find({ email: email });
+    const username = result[0].username;
+    const name = result[0].name;
+    const dob = result[0].dob;
+    const profilePic = result[0].profilePic;
+    res.render('community', { username: username, name: name, email: email, dob: dob, profilePic: profilePic, stylesheetPath: './styles/community.css' })
+})
+// LET USER POST TEXT CONTENT IN THE COMMUNITY PAGE
+
 
 app.get('/saveImage', userAuthenticator, async (req, res) => {
     var selectedImage = req.query.selectedImage;
