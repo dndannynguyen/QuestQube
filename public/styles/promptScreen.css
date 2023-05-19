@@ -1,0 +1,153 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #232526;
+    flex-direction: column;
+    gap: 50px;
+    width: 100%;
+    margin: 0
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 100px;
+    width: 90%;
+}
+
+.picture img {
+    width: 300px;
+}
+
+.prompt-card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 35px #232526;
+    transition: 0.5s;
+}
+
+.prompt-options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.prompt p {
+    color: #FBDC6A;
+    font-size: 1.8em;
+    letter-spacing: 0.1em;
+    font-weight: 400;
+    text-align: center;
+}
+
+.prompt-options a {
+    position: relative;
+    color: #FBDC6A;
+    text-decoration: none;
+    font-size: 1.5em;
+    letter-spacing: 0.05em;
+    font-weight: 300;
+    padding: 10px 30px;
+    border: 1px solid #FBDC6A;
+    border-radius: 10px;
+    transition: 0.5s;
+    margin-bottom: 10px;
+}
+
+.prompt-options a:hover {
+    background: var(--clr);
+    color: var(--clr);
+    letter-spacing: 0.12em;
+    box-shadow: 0 0 35px var(--clr);
+}
+
+.prompt-options a:before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    background: #232526;
+}
+
+.prompt-options a span {
+    position: relative;
+    z-index: 1;
+}
+
+.prompt-options a i {
+    position: absolute;
+    inset: 0;
+    display: block;
+}
+
+.prompt-options a i::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 80%;
+    width: 10px;
+    height: 4px;
+    background: #232526;
+    transform: translateX(-50%) skew(325deg);
+    transition: 0.5s;
+}
+
+.prompt-options a:hover i::before {
+    width: 20px;
+    left: 20%;
+}
+
+.prompt-options a i::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20%;
+    width: 10px;
+    height: 4px;
+    background: #232526;
+    transform: translateX(-50%) skew(325deg);
+    transition: 0.5s;
+}
+
+.prompt-options a:hover i::after {
+    width: 20px;
+    left: 80%;
+}
+
+@media screen and (min-width: 768px) {
+    nav {
+        width: 100%;
+    }
+
+    .footer {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .footer {
+        z-index: 1
+    }
+
+    .content {
+        margin-bottom: 120px;
+    }
+}

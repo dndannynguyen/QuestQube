@@ -1,0 +1,34 @@
+<%- include("templates/head", { stylesheetPath:
+['/styles/finalRecommend.css','/styles/nav.css','/styles/foot.css'] }) %> <%-
+include("templates/nav") %>
+<script src="/scripts/scrapeImages.js"></script>
+<div class="content">
+  <div>
+    <p class="p1">Congrats on finishing your adventure!</p>
+  </div>
+  <div>
+    <p class="p2">
+      Based on your chosen adventure, we recommend the following games:
+    </p>
+  </div>
+  <div class="game-cards">
+    <% for (let i = 0; i < 3; i++) { %>
+    <div class="game-info">
+      <div class="picture">
+        <img id="game-image-<%= i %>" src="" alt="" />
+      </div>
+      <div class="options">
+        <h1><%= gamesList[i] %></h1>
+        <a href="#" style="--clr: #fceabb"><span>View Details</span><i></i></a>
+        <a href="#" style="--clr: #fceabb"
+          ><span>Add to Wishlist</span><i></i
+        ></a>
+      </div>
+    </div>
+    <script>
+      scrapeImages('<%= slugList[i] %>', 'game-image-<%= i %>'); 
+    </script>
+    <% } %>
+  </div>
+</div>
+<%- include("templates/foot") %>

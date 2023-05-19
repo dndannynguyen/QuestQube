@@ -11,7 +11,9 @@ const userSchema = new mongoose.Schema({
     dob: String,
     security_question: String,
     security_answer: String,
-    profilePic: String
+    profilePic: String,
+    promptsArray: Array,
+    answersArray: Array,
 })
 
 const User = mongoose.model('users', userSchema)

@@ -1,0 +1,28 @@
+<%- include("templates/head", { stylesheetPath:
+['/styles/promptScreen.css','/styles/nav.css','/styles/foot.css'] }) %> <%-
+include("templates/nav") %>
+<div class="content">
+      <div class="picture">
+        <% if (count == 1) { %>
+          <img src="mediaResources/guild.jpg" alt="" />
+        <% } else if (count == 2) { %>
+          <img src="mediaResources/city.jpg" alt="" />
+        <% } %>
+      </div>
+      <div class="prompt-card">
+        <div class="prompt">
+          <p>
+            <%= options[0] %>
+          </p>
+        </div>
+        <div class="prompt-options">
+          <% for (var i = 1; i < options.length; i++) { %>
+            <a href="/optionProcess?answer=<%= encodeURIComponent(options[i]) %>" style="--clr:#fceabb"><span>
+              <%= options[i] %></span><i></i>
+            </a>
+            <br>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <%- include("templates/foot") %>
