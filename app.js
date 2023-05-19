@@ -60,60 +60,6 @@ const b2 = new B2({
     applicationKey: backblaze_API
   });
 
-//   async function GetBucketAndUploadPhoto() {
-//     try {
-//       await b2.authorize();
-//       let response = await b2.getBucket({ bucketName: backblaze_name });
-//       console.log(response.data);
-//       console.log("Success! Backblaze server is connected.");
-  
-//       // Define the folder name
-//       const folderName = 'user';
-  
-//       // Upload a photo to the bucket in the specified folder
-//       const photoPath = 'C:/Users/marti/Documents/2800-202310-DTC10/public/mediaResources/avatars/1.jpg';
-//       const fileName = folderName + '/uploaded-photo.jpg';
-  
-//       fs.readFile(photoPath, async (err, fileData) => {
-//         if (err) {
-//           console.log('Error reading photo:', err);
-//           return;
-//         }
-  
-//         try {
-//           const uploadUrlResponse = await b2.getUploadUrl({ bucketId: backblaze_bucket });
-//           const uploadUrl = uploadUrlResponse.data.uploadUrl;
-//           const uploadAuthToken = uploadUrlResponse.data.authorizationToken;
-//           console.log('Got an upload URL:', uploadUrl);
-//           console.log('Got an upload auth token:', uploadAuthToken);
-
-//           // Calculate the SHA1 hash of the file content
-//         const contentSha1 = crypto.createHash('sha1').update(fileData).digest('hex');
-  
-//           // Call the uploadFile method with the obtained upload URL and auth token
-//           await b2.uploadFile({
-//             uploadUrl: uploadUrl,
-//             uploadAuthToken: uploadAuthToken,
-//             fileName: fileName,
-//             data: fileData,
-//             bucketName: backblaze_name,
-//             contentSha1: contentSha1
-//           });
-//           console.log('Photo uploaded successfully:', fileName);
-  
-//         } catch (error) {
-//           console.error('Error uploading photo:', error);
-//         }
-//       });
-//     } catch (err) {
-//       console.log('Error getting bucket:', err);
-//     }
-//   }
-  
-//   // Call the function to get the bucket and upload the photo when the page loads
-//   GetBucketAndUploadPhoto();
-
-
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
     crypto: {
@@ -560,10 +506,6 @@ app.post('/removeWishlist', userAuthenticator, async (req, res) => {
     res.redirect('/wishlist')
 })
 
-//FRIENDS PAGE
-app.get('/friends', userAuthenticator, async (req, res) => {
-    const email = req.session.email;
-    
 //INITIAL RECOMMENDER SCREEN
 app.get("/initialRecommend", userAuthenticator, async (req, res) => {
     req.session.count = 0;
@@ -577,9 +519,23 @@ app.get("/initialRecommend", userAuthenticator, async (req, res) => {
 });
 
 //FINAL RECOMMENDER SCREEN
-app.get("/finalRecommend", userAuthenticator, (req, res) => {
+app.get("/finalRecommend", userAuthenticator, async (req, res) => {
+  let message = prompts.systemMessage3
+  console.log("message:", message)
   const email = req.session.email
-  
+  // { role: "assistant", content: promptsArray[0] }
+  const user = await userModel.findOne({ email: email });
+  console.log(user)
+  const answersArray = user.answersArray
+  answersArray.forEach((answer) => {
+    message.push({ role: "user", content: answer })
+    })
+  console.log("answersArray:", answersArray)
+  answersArray.forEach((answer) => {
+    message.push({ role: "user", content: answer })
+  })
+  const content = await gpt(message)
+  console.log("content:", content)
   res.render("finalRecommend", {
     stylesheetPath: ["./styles/finalRecommend.css"],
   });
