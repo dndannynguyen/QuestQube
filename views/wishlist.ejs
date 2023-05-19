@@ -10,7 +10,7 @@
               <script src="/scripts/scrapeImages.js"></script>
               <div id="wishlist-container">
                 <h1 class="mb-4">Wishlist Games</h1>
-                <div class="wishlist">
+                <div class="favourites">
                   <form autocomplete="off" action="/verifyWishlist" method="post">
                     <h4>Add to wishlist</h4>
                     <%- include('templates/gameSearchbar') %>
@@ -23,7 +23,7 @@
                         <br>
                         <div class="row">
                           <% for (var j=0; j < wishlist.length; j++) { %>
-                            <div class="col-md-4" style="margin-top: 15px;">
+                            <div class="col-md-4" style="margin-top: 15px; margin-bottom: 20px;">
                               <div class="card mb-4">
                                 <img id="game-image-<%= j %>" src="" alt="" class="card-img-top">
                                 <div class="card-body">

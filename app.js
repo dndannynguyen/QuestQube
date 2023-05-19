@@ -645,7 +645,7 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   console.log("answersArray:", answersArray);
   let content = await gpt(message);
   if (!content.startsWith("#")) {
-    const hashtagIndex = strippedContent.indexOf("#");
+    const hashtagIndex = content.indexOf("#");
     if (hashtagIndex !== -1) {
       content = content.substring(hashtagIndex);
     }
@@ -657,8 +657,53 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     options = content.split(/#\d+\s+/).filter((option) => option !== "");
     attempts++;
   }
+  options = options.map(function (option) {
+    return option.replace(/\n/g, "");
+  });
+  console.log("options:", options);
+  let game1,
+    game2,
+    game3,
+    game4,
+    game5,
+    game6,
+    game7,
+    game8,
+    game9,
+    game10 = null;
+  let gamesList = [
+    game1,
+    game2,
+    game3,
+    game4,
+    game5,
+    game6,
+    game7,
+    game8,
+    game9,
+    game10,
+  ];
+  let slugArray = [];
+  let gameArray = [];
+
+  // Use `map` to create an array of promises
+  let promises = gamesList.map(async (game) => {
+    game = options.pop();
+    let result = await verifyGame(game);
+    console.log(result);
+    if (result) {
+      slugArray.push(result);
+      gameArray.push(game)
+    }
+  });
   
+  // Wait for all promises to resolve using `Promise.all`
+  await Promise.all(promises);
+  
+  console.log("finalArray:", slugArray);
   res.render("finalRecommend", {
+    slugList: slugArray,
+    gamesList: gameArray,
     stylesheetPath: ["./styles/finalRecommend.css"],
   });
 });
@@ -678,14 +723,12 @@ app.get(
     let message = null;
     if (req.session.count == 1) {
       message = prompts.systemMessage1;
-      console.log("checkpoint 1", message);
     } else if (req.session.count == 2) {
       message = prompts.systemMessage2;
       const promptFormatted = { role: "assistant", content: promptsArray[0] };
       const answerFormatted = { role: "user", content: answersArray[0] };
       message.push(promptFormatted);
       message.push(answerFormatted);
-      console.log("checkpoint 2", message);
     } else if (req.session.count == 3) {
       // message = prompts.systemMessage3
       // const answerFormatted1 = { role: "user", content: answersArray[0] }
