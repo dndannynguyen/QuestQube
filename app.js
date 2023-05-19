@@ -638,10 +638,12 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   // { role: "assistant", content: promptsArray[0] }
   const user = await userModel.findOne({ email: email });
   console.log(user);
+  const promptsArray = user.promptsArray;
   const answersArray = user.answersArray;
-  answersArray.forEach((answer) => {
-    message.push({ role: "user", content: answer });
-  });
+  for (let i = 0; i < promptsArray.length; i++) {
+    message.push({ role: "assistant", content: promptsArray[i] });
+    message.push({ role: "user", content: answersArray[i] });
+  }
   console.log("answersArray:", answersArray);
   let content = await gpt(message);
   if (!content.startsWith("#")) {
@@ -652,14 +654,26 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   }
   let attempts = 0;
   options = content.split(/#\d+\s+/).filter((option) => option !== "");
+  console.log(options.length)
+  console.log(attempts)
   while (options.length < 9 && attempts < 5) {
-    const content = await gpt(message);
+    let content = await gpt(message);
     options = content.split(/#\d+\s+/).filter((option) => option !== "");
     attempts++;
+    console.log("final attempts:", attempts)
+  }
+  if (attempts >= 5) {
+    return res.redirect("/initialRecommend");
   }
   options = options.map(function (option) {
     return option.replace(/\n/g, "");
   });
+  if (options.length < 9) {
+    while (options.length < 9) {
+      options.push("No more recommendations available");
+    }
+    console.log('pushed')
+  }
   console.log("options:", options);
   let game1,
     game2,
@@ -741,7 +755,7 @@ app.get(
       res.redirect("/initialRecommend");
     }
 
-    const content = await gpt(message);
+    let content = await gpt(message);
 
     if (!content) {
       return res.redirect("/initialRecommend");
@@ -750,10 +764,11 @@ app.get(
     options = content.split(/#\d+\s+/).filter((option) => option !== "");
     let attempts = 0;
     while (options.length < 4 && attempts < 5) {
-      const content = await gpt(message);
+      let content = await gpt(message);
       options = content.split(/#\d+\s+/).filter((option) => option !== "");
       attempts++;
       console.log("attempts:", attempts);
+      console.log(options)
     }
 
     await userCollection.updateOne(
