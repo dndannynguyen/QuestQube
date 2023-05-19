@@ -31,7 +31,11 @@ const gpt = async (message) => {
 
     const choices = await createChatCompletion(message, options);
 
-    return choices[0].message.content;
+    try {
+        return choices[0].message.content;
+    } catch (error) {
+        return false
+    }
 }
 
 module.exports = gpt;

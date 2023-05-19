@@ -149,25 +149,6 @@ app.get('/signup', (req, res) => {
     res.render('signup', { stylesheetPath: ['./styles/login.css'] })
 });
 
-//INITIAL RECOMMENDER SCREEN
-app.get("/initialRecommend", (req, res) => {
-    req.session.count = 0;
-  res.render("initialRecommend", {
-    stylesheetPath: ["./styles/initialRecommend.css"],
-  });
-});
-
-//FINAL RECOMMENDER SCREEN
-app.get("/finalRecommend", (req, res) => {
-  res.render("finalRecommend", {
-    stylesheetPath: ["./styles/finalRecommend.css"],
-  });
-});
-
-//PROMPT SCREEN
-app.get("/promptScreen", (req, res) => {
-    res.render("promptScreen", { stylesheetPath: ["./styles/promptScreen.css"] });
-});
 
 // SIGN UP SUBMIT PAGE
 app.post('/signupSubmit', async (req, res) => {
@@ -579,24 +560,94 @@ app.post('/removeWishlist', userAuthenticator, async (req, res) => {
     res.redirect('/wishlist')
 })
 
+//FRIENDS PAGE
+app.get('/friends', userAuthenticator, async (req, res) => {
+    const email = req.session.email;
+    
+//INITIAL RECOMMENDER SCREEN
+app.get("/initialRecommend", userAuthenticator, async (req, res) => {
+    req.session.count = 0;
+    const email = req.session.email
+    // clear the prompt and answer fields in user collection
+    await userCollection.updateOne({ email: email }, { $set: { promptsArray: [] } });
+    await userCollection.updateOne({ email: email }, { $set: { answersArray: [] } });
+    res.render("initialRecommend", {
+    stylesheetPath: ["./styles/initialRecommend.css"],
+  });
+});
+
+//FINAL RECOMMENDER SCREEN
+app.get("/finalRecommend", userAuthenticator, (req, res) => {
+  const email = req.session.email
+  
+  res.render("finalRecommend", {
+    stylesheetPath: ["./styles/finalRecommend.css"],
+  });
+});
+
 // RECOMMENDER PAGE
 app.get('/recommender', userAuthenticator, recommenderAuthenticator, async (req, res) => {
-    const messageOne = prompts.systemMessage1
-    // const content = await gpt(messageOne)
-    const content = "This is a test. #1 annsssaflsalm #2 akngkjnfkasnfa #3 kasnvkjanvka #4 kasnjlkasnfkas #5 asjnsalflkasf"
-    const options = content.split(/#\d+\s+/).filter(option => option !== ""); // Regular expression pattern to match any digit followed by a dot and a space
-    console.log(options)
-    const question = options[0];
-    console.log(question)
-    res.render('promptScreen', { options: options, stylesheetPath: ['./styles/promptScreen.css'] })
+    const email = req.session.email;
+    const user = await userModel.findOne({ email: email });
+    const answersArray = user.answersArray
+    const promptsArray = user.promptsArray
+    req.session.count = req.session.count + 1
+    console.log("session cookies equals", req.session.count)
+    let message = null
+    if (req.session.count == 1) {           
+        message = prompts.systemMessage1
+        console.log("checkpoint 1", message)
+    } else if (req.session.count == 2) {
+        message = prompts.systemMessage2
+        const promptFormatted = { role: "assistant", content: promptsArray[0] }
+        const answerFormatted =  { role: "user", content: answersArray[0] }
+        message.push(promptFormatted)
+        message.push(answerFormatted)
+        console.log("checkpoint 2", message)
+    } else if (req.session.count == 3) {
+        // message = prompts.systemMessage3
+        // const answerFormatted1 = { role: "user", content: answersArray[0] }
+        // const answerFormatted2 = { role: "user", content: answersArray[1] }
+        // message.push(answerFormatted1)
+        // message.push(answerFormatted2)
+        // console.log("checkpoint 3", message)
+        return res.redirect('/finalRecommend')
+    } else {
+        res.redirect('/initialRecommend')
+    }
+    
+    const content = await gpt(message)
+
+    if (!content) {
+        return res.redirect('/initialRecommend')
+    }
+
+    options = content.split(/#\d+\s+/).filter(option => option !== "")
+    let attempts = 0;
+    while (options.length < 4 && attempts < 5) {
+      const content = await gpt(message);
+      options = content.split(/#\d+\s+/).filter(option => option !== "");
+      attempts++;
+      console.log("attempts:", attempts)
+    }
+  
+    if (options.length < 2) {
+      // Handle the case when options are still less than 2 after 5 attempts
+      // code to reprompt GPT or take appropriate action
+    } else {
+      // Continue with the rest of your logic
+      await userCollection.updateOne({ email: email }, { $push: { promptsArray: options[0] } });
+      res.render('promptScreen', { options: options, stylesheetPath: ['./styles/promptScreen.css'] });
+    }
 })
 
 app.get('/optionProcess', userAuthenticator, async (req, res) => {
-    const answer = req.body.answer;
-    const answers = [];
-    answers.push(answer);
-    
-})
+    const email = req.session.email;
+    const answer = req.query.answer;
+    await userCollection.updateOne({ email: email }, { $push: { answersArray: answer } });
+
+    res.redirect(`/recommender`);
+});
 
 app.get("*", (req, res) => {
     res.status(404);

@@ -11,9 +11,12 @@ include("templates/nav") %>
             <%= options[0] %>
           </p>
         </div>
-        <div class="options">
+        <div>
           <% for (var i = 1; i < options.length; i++) { %>
-            <a href="finalRecommend" style="--clr:#fceabb"><span><%= options[i] %></span><i></i></a>
+            <a style="color: white;" href="/optionProcess?answer=<%= encodeURIComponent(options[i]) %>">
+              <%= options[i] %>
+            </a>
+            <br>
           <% } %>
         </div>
       </div>
