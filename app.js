@@ -415,22 +415,14 @@ app.post('/updateInfo', userAuthenticator, async (req, res) => {
             });
         }
 
-        const result = await userModel.find({
-            email: email,
-        })
-        if (result.length == 0) {
-            res.render('loginSubmit.ejs')
-        } else if (bcrypt.compareSync(confirmPassword, result[0].password)) {
-            console.log("passwords match")
-            if (newPassword !== user.password) {
-                await userCollection.updateOne({
-                    email: email
-                }, {
-                    $set: {
-                        password: bcrypt.hashSync(newPassword, 12)
-                    }
-                });
-            }
+        if (newPassword !== user.password && newPassword === confirmPassword) {
+            await userCollection.updateOne({
+                email: email
+            }, {
+                $set: {
+                    password: bcrypt.hashSync(newPassword, 12)
+                }
+            });
         }
 
         // Redirect or respond with a success message
