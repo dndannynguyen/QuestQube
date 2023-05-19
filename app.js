@@ -413,7 +413,7 @@ app.post('/updateInfo', userAuthenticator, async (req, res) => {
             });
         }
 
-        if (newPassword !== user.password && newPassword === confirmPassword) {
+        if (!bcrypt.compareSync(newPassword, user.password) && newPassword === confirmPassword) {
             await userCollection.updateOne({
                 email: email
             }, {
