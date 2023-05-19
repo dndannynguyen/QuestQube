@@ -15,6 +15,7 @@ const B2 = require('backblaze-b2');
 const fs = require('fs');
 const multer = require('multer');
 const { PassThrough } = require('stream');
+const { profile } = require('console')
 
 app.use(express.urlencoded({ extended: false }))
 app.use(express.static('public'));
@@ -253,7 +254,8 @@ app.get('/profile', userAuthenticator, async (req, res) => {
     const name = result[0].name;
     const dob = result[0].dob;
     const profilePic = result[0].profilePic;
-  
+
+    if (profilePic) {
     // Connect to Backblaze B2 storage
     const b2 = new B2({
       applicationKeyId: backblaze_account,
@@ -275,6 +277,9 @@ app.get('/profile', userAuthenticator, async (req, res) => {
     } catch (error) {
       console.error('Error connecting to Backblaze:', error);
       res.render('profile', { username, name, email, dob, profilePic, stylesheetPath: './styles/profile.css' });
+    }
+    } else {
+        res.render('profile', { username, name, email, dob, profilePic, stylesheetPath: './styles/profile.css' })
     }
   });
   
