@@ -197,6 +197,7 @@ app.get("/", (req, res) => {
   const stylesheets = ["/styles/index.css", "/styles/foot.css"];
   res.render("index", { stylesheets });
 });
+
 // LOGIN SUBMIT PAGE
 app.post("/loginSubmit", async (req, res) => {
   const schema = joi.object({
@@ -660,6 +661,7 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     let content = await gpt(message);
     options = content.split(/#\d+\s+/).filter((option) => option !== "");
     attempts++;
+    console.log("options:", options)
     console.log("final attempts:", attempts)
   }
   if (attempts >= 5) {

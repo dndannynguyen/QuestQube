@@ -94,6 +94,7 @@ const systemMessage3 = [
     I want to create a choose your own adventure game where we give prompts to the user to determine what kind of games they like. At the end of the game we recommend a game that they may like based on their answers to the prompts.
 
     Rules:
+    Do not continue the story, just give the user a list of 10 games that they may like.
     Final recommendations must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
     Do not include any dialogue before or after the recommendations.
     Keep the word count below 150.
