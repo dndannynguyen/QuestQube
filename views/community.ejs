@@ -1,0 +1,56 @@
+<%- include("templates/head", { stylesheetPath:['/styles/community.css','/styles/nav.css','/styles/foot.css'] }) %>
+  <%- include("templates/nav") %>
+
+    <section class="d-flex align-items-center justify-content-center">
+      <!-- CREATE A ADD BUTTON -->
+      <!-- CREATE A FORM CALLED 'ADD POST FORM' -->
+      <form id="addPostForm" class="add-post-form">
+        <!-- CREATE A TEXTAREA CALLED 'POST CONTENT' -->
+        <textarea class="form-control text-dark col-lg-4 custom-textarea" name="post-content" id="post-content"
+          cols="30" rows="3">Hello</textarea>
+        <button id="addPost" class="btn btn-success w-100"><b>Add Post</b></button>
+      </form>
+    </section>
+    <br>
+    <br>
+    <br>
+
+
+    <!-- CREATE A PAGE FOR COMMUNITY, INLUCUDE ADD POST, OTHERS' POST, LIKE AND COMMENT -->
+
+    <div class="row align-items-center justify-content-center">
+      <div id="post" class=" w-100 btn-outline-warning">
+        <div class="post-container">
+          <div class="post-header">
+            <div class="post-header-image">
+              <img src="./public/mediaResources/1.jpg" alt="profile picture">
+            </div>
+            <br>
+            <div class="post-header-info">
+              <div class="post-header-info-name">
+                <h3>John Doe</h3>
+              </div>
+              <div class="post-header-info-date">
+                <p>Posted on 12/12/2020</p>
+              </div>
+            </div>
+          </div>
+          <div class="post-body">
+            Hello everyone! Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione dolorem nulla repellendus,
+            necessitatibus eum soluta ea repellat incidunt animi saepe. Quisquam libero voluptatum esse aperiam nisi cum
+            aspernatur officia quos?
+          </div>
+          <br>
+          <div class="post-footer">
+            <div class="post-footer-interaction">
+              <button class="btn btn-success">Like</button>
+              <button class="btn btn-primary">Comment</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+      <%- include("templates/foot") %>

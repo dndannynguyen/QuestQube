@@ -41,15 +41,15 @@ const userCollection = database.db(mongodb_database).collection('users');
 
 const multerStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-      // Specify the destination folder where the uploaded file will be saved
-      cb(null, 'uploads');
+        // Specify the destination folder where the uploaded file will be saved
+        cb(null, 'uploads');
     },
     filename: (req, file, cb) => {
-      // Generate a unique filename for the uploaded file
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      cb(null, file.fieldname + '-' + uniqueSuffix);
+        // Generate a unique filename for the uploaded file
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, file.fieldname + '-' + uniqueSuffix);
     }
-  });
+});
 const upload = multer({ storage: multerStorage });
 
 app.use(express.urlencoded({
@@ -59,7 +59,7 @@ app.use(express.urlencoded({
 const b2 = new B2({
     applicationKeyId: backblaze_account,
     applicationKey: backblaze_API
-  });
+});
 
 var mongoStore = MongoStore.create({
     mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
@@ -167,6 +167,7 @@ app.get("/", (req, res) => {
     const stylesheets = ["/styles/index.css", "/styles/foot.css"];
     res.render("index", { stylesheets });
 });
+
 // LOGIN SUBMIT PAGE
 app.post('/loginSubmit', async (req, res) => {
     const schema = joi.object({
@@ -256,106 +257,119 @@ app.get('/profile', userAuthenticator, async (req, res) => {
     const profilePic = result[0].profilePic;
 
     if (profilePic) {
-    // Connect to Backblaze B2 storage
-    const b2 = new B2({
-      applicationKeyId: backblaze_account,
-      applicationKey: backblaze_API
-    });
-  
-    try {
-      // Authorize with Backblaze B2
-      await b2.authorize();
-  
-      // Get the bucket information
-      let response = await b2.getBucket({ bucketName: backblaze_name });
-      const bucketInfo = response.data;
-  
-      const profilePicFileName = `${email}/Profile_Picture.jpg`;
-      const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}?${Date.now()}`;
-  
-      res.render('profile', { username, name, email, dob, profilePic: profilePicUrl, stylesheetPath: './styles/profile.css' });
-    } catch (error) {
-      console.error('Error connecting to Backblaze:', error);
-      res.render('profile', { username, name, email, dob, profilePic, stylesheetPath: './styles/profile.css' });
-    }
+        // Connect to Backblaze B2 storage
+        const b2 = new B2({
+            applicationKeyId: backblaze_account,
+            applicationKey: backblaze_API
+        });
+
+        try {
+            // Authorize with Backblaze B2
+            await b2.authorize();
+
+            // Get the bucket information
+            let response = await b2.getBucket({ bucketName: backblaze_name });
+            const bucketInfo = response.data;
+
+            const profilePicFileName = `${email}/Profile_Picture.jpg`;
+            const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}?${Date.now()}`;
+
+            res.render('profile', { username, name, email, dob, profilePic: profilePicUrl, stylesheetPath: './styles/profile.css' });
+        } catch (error) {
+            console.error('Error connecting to Backblaze:', error);
+            res.render('profile', { username, name, email, dob, profilePic, stylesheetPath: './styles/profile.css' });
+        }
     } else {
         res.render('profile', { username, name, email, dob, profilePic, stylesheetPath: './styles/profile.css' })
     }
-  });
-  
+});
 
-  app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (req, res) => {
+
+//COMMUNITY FORUM PAGE
+app.get('/community', userAuthenticator, async (req, res) => {
     const email = req.session.email;
-  
+    const result = await userModel.find({ email: email });
+    const username = result[0].username;
+    const name = result[0].name;
+    const dob = result[0].dob;
+    const profilePic = result[0].profilePic;
+    res.render('community', { username: username, name: name, email: email, dob: dob, profilePic: profilePic, stylesheetPath: './styles/community.css' })
+})
+// LET USER POST TEXT CONTENT IN THE COMMUNITY PAGE
+
+
+app.post('/saveImage', userAuthenticator, upload.single('profilePic'), async (req, res) => {
+    const email = req.session.email;
+
     // Configure your Backblaze B2 settings
     const b2 = new B2({
-      applicationKeyId: backblaze_account,
-      applicationKey: backblaze_API
+        applicationKeyId: backblaze_account,
+        applicationKey: backblaze_API
     });
-  
+
     try {
-      // Authorize with Backblaze B2
-      await b2.authorize();
-  
-      // Get the bucket information
-      let response = await b2.getBucket({ bucketName: backblaze_name });
-  
-      // Read the uploaded image file from the saved path on the file system
-      const fileData = fs.readFileSync(req.file.path);
-  
-      // Calculate the SHA1 hash of the file content
-      const contentSha1 = crypto.createHash('sha1').update(fileData).digest('hex');
-  
-      // Define the folder name as the user's ID
-      const folderName = `${email}`;
-  
-      // Define the file name as "Profile_Picture.jpg"
-      const fileName = `${folderName}/Profile_Picture.jpg`;
-  
-      // Get the upload URL and authorization token
-      const uploadUrlResponse = await b2.getUploadUrl({ bucketId: backblaze_bucket });
-      const uploadUrl = uploadUrlResponse.data.uploadUrl;
-      const uploadAuthToken = uploadUrlResponse.data.authorizationToken;
-  
-      // Upload the file to Backblaze B2
-      await b2.uploadFile({
-        uploadUrl: uploadUrl,
-        uploadAuthToken: uploadAuthToken,
-        fileName: fileName,
-        data: fileData,
-        bucketName: backblaze_name,
-        contentSha1: contentSha1
-      });
-      console.log('Photo uploaded successfully:', fileName);
-  
-      // Delete the uploaded file from the local filesystem
-      fs.unlinkSync(req.file.path);
-  
-      // Retrieve the current profile picture file path from the user document
-      const user = await userModel.findOne({ email });
-      const currentProfilePic = user.profilePic;
-  
-      // Check if the current profile picture file path exists and is different from the new file path
-      if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
-        // Extract the file name from the current profile picture file path
-        const currentFileName = currentProfilePic.substring(1);
-  
-        // Delete the old profile picture file from Backblaze B2
-        await b2.deleteFileVersion({ bucketId: backblaze_bucket, fileName: currentFileName });
-        console.log('Old profile picture file deleted:', currentFileName);
-      }
-  
-      // Update the user's profilePic field in the database with the new file path
-      await userCollection.updateOne({ email }, { $set: { profilePic: `/${fileName}` } });
-  
-      // Redirect to the profile page or display a success message
-      res.redirect('/profile');
-      } catch (error) {
-      console.error('Error uploading image:', error);
-      // Handle the error accordingly
-      // res.redirect('/profile'); // Redirect to the profile page or display an error message
-      }
-      });  
+        // Authorize with Backblaze B2
+        await b2.authorize();
+
+        // Get the bucket information
+        let response = await b2.getBucket({ bucketName: backblaze_name });
+
+        // Read the uploaded image file from the saved path on the file system
+        const fileData = fs.readFileSync(req.file.path);
+
+        // Calculate the SHA1 hash of the file content
+        const contentSha1 = crypto.createHash('sha1').update(fileData).digest('hex');
+
+        // Define the folder name as the user's ID
+        const folderName = `${email}`;
+
+        // Define the file name as "Profile_Picture.jpg"
+        const fileName = `${folderName}/Profile_Picture.jpg`;
+
+        // Get the upload URL and authorization token
+        const uploadUrlResponse = await b2.getUploadUrl({ bucketId: backblaze_bucket });
+        const uploadUrl = uploadUrlResponse.data.uploadUrl;
+        const uploadAuthToken = uploadUrlResponse.data.authorizationToken;
+
+        // Upload the file to Backblaze B2
+        await b2.uploadFile({
+            uploadUrl: uploadUrl,
+            uploadAuthToken: uploadAuthToken,
+            fileName: fileName,
+            data: fileData,
+            bucketName: backblaze_name,
+            contentSha1: contentSha1
+        });
+        console.log('Photo uploaded successfully:', fileName);
+
+        // Delete the uploaded file from the local filesystem
+        fs.unlinkSync(req.file.path);
+
+        // Retrieve the current profile picture file path from the user document
+        const user = await userModel.findOne({ email });
+        const currentProfilePic = user.profilePic;
+
+        // Check if the current profile picture file path exists and is different from the new file path
+        if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
+            // Extract the file name from the current profile picture file path
+            const currentFileName = currentProfilePic.substring(1);
+
+            // Delete the old profile picture file from Backblaze B2
+            await b2.deleteFileVersion({ bucketId: backblaze_bucket, fileName: currentFileName });
+            console.log('Old profile picture file deleted:', currentFileName);
+        }
+
+        // Update the user's profilePic field in the database with the new file path
+        await userCollection.updateOne({ email }, { $set: { profilePic: `/${fileName}` } });
+
+        // Redirect to the profile page or display a success message
+        res.redirect('/profile');
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        // Handle the error accordingly
+        // res.redirect('/profile'); // Redirect to the profile page or display an error message
+    }
+});
 
 app.get('/logout', userAuthenticator, (req, res) => {
     req.session.destroy()
@@ -509,31 +523,31 @@ app.get("/initialRecommend", userAuthenticator, async (req, res) => {
     await userCollection.updateOne({ email: email }, { $set: { promptsArray: [] } });
     await userCollection.updateOne({ email: email }, { $set: { answersArray: [] } });
     res.render("initialRecommend", {
-    stylesheetPath: ["./styles/initialRecommend.css"],
-  });
+        stylesheetPath: ["./styles/initialRecommend.css"],
+    });
 });
 
 //FINAL RECOMMENDER SCREEN
 app.get("/finalRecommend", userAuthenticator, async (req, res) => {
-  let message = prompts.systemMessage3
-  console.log("message:", message)
-  const email = req.session.email
-  // { role: "assistant", content: promptsArray[0] }
-  const user = await userModel.findOne({ email: email });
-  console.log(user)
-  const answersArray = user.answersArray
-  answersArray.forEach((answer) => {
-    message.push({ role: "user", content: answer })
+    let message = prompts.systemMessage3
+    console.log("message:", message)
+    const email = req.session.email
+    // { role: "assistant", content: promptsArray[0] }
+    const user = await userModel.findOne({ email: email });
+    console.log(user)
+    const answersArray = user.answersArray
+    answersArray.forEach((answer) => {
+        message.push({ role: "user", content: answer })
     })
-  console.log("answersArray:", answersArray)
-  answersArray.forEach((answer) => {
-    message.push({ role: "user", content: answer })
-  })
-  const content = await gpt(message)
-  console.log("content:", content)
-  res.render("finalRecommend", {
-    stylesheetPath: ["./styles/finalRecommend.css"],
-  });
+    console.log("answersArray:", answersArray)
+    answersArray.forEach((answer) => {
+        message.push({ role: "user", content: answer })
+    })
+    const content = await gpt(message)
+    console.log("content:", content)
+    res.render("finalRecommend", {
+        stylesheetPath: ["./styles/finalRecommend.css"],
+    });
 });
 
 // RECOMMENDER PAGE
@@ -545,13 +559,13 @@ app.get('/recommender', userAuthenticator, recommenderAuthenticator, async (req,
     req.session.count = req.session.count + 1
     console.log("session cookies equals", req.session.count)
     let message = null
-    if (req.session.count == 1) {           
+    if (req.session.count == 1) {
         message = prompts.systemMessage1
         console.log("checkpoint 1", message)
     } else if (req.session.count == 2) {
         message = prompts.systemMessage2
         const promptFormatted = { role: "assistant", content: promptsArray[0] }
-        const answerFormatted =  { role: "user", content: answersArray[0] }
+        const answerFormatted = { role: "user", content: answersArray[0] }
         message.push(promptFormatted)
         message.push(answerFormatted)
         console.log("checkpoint 2", message)
@@ -566,7 +580,7 @@ app.get('/recommender', userAuthenticator, recommenderAuthenticator, async (req,
     } else {
         res.redirect('/initialRecommend')
     }
-    
+
     const content = await gpt(message)
 
     if (!content) {
@@ -576,19 +590,19 @@ app.get('/recommender', userAuthenticator, recommenderAuthenticator, async (req,
     options = content.split(/#\d+\s+/).filter(option => option !== "")
     let attempts = 0;
     while (options.length < 4 && attempts < 5) {
-      const content = await gpt(message);
-      options = content.split(/#\d+\s+/).filter(option => option !== "");
-      attempts++;
-      console.log("attempts:", attempts)
+        const content = await gpt(message);
+        options = content.split(/#\d+\s+/).filter(option => option !== "");
+        attempts++;
+        console.log("attempts:", attempts)
     }
-  
+
     if (options.length < 2) {
-      // Handle the case when options are still less than 2 after 5 attempts
-      // code to reprompt GPT or take appropriate action
+        // Handle the case when options are still less than 2 after 5 attempts
+        // code to reprompt GPT or take appropriate action
     } else {
-      // Continue with the rest of your logic
-      await userCollection.updateOne({ email: email }, { $push: { promptsArray: options[0] } });
-      res.render('promptScreen', { options: options, stylesheetPath: ['./styles/promptScreen.css'] });
+        // Continue with the rest of your logic
+        await userCollection.updateOne({ email: email }, { $push: { promptsArray: options[0] } });
+        res.render('promptScreen', { options: options, stylesheetPath: ['./styles/promptScreen.css'] });
     }
 })
 
