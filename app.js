@@ -661,6 +661,7 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     let content = await gpt(message);
     options = content.split(/#\d+\s+/).filter((option) => option !== "");
     attempts++;
+    console.log("options:", options)
     console.log("final attempts:", attempts)
   }
   if (attempts >= 5) {

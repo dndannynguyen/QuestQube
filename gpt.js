@@ -25,7 +25,7 @@ const createChatCompletion = async (messages, options = {}) => {
 const gpt = async (message) => {
 
     const options = {
-        temperature: 0.5,
+        temperature: 0.4,
         max_tokens: 150,
     };
 
