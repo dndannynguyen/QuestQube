@@ -615,6 +615,7 @@ app.post("/removeWishlist", userAuthenticator, async (req, res) => {
 //INITIAL RECOMMENDER SCREEN
 app.get("/initialRecommend", userAuthenticator, async (req, res) => {
   req.session.count = 0;
+  console.log("session cookies reset")
   req.session.genre = 0;
   const email = req.session.email;
   // clear the prompt and answer fields in user collection
@@ -622,10 +623,12 @@ app.get("/initialRecommend", userAuthenticator, async (req, res) => {
     { email: email },
     { $set: { promptsArray: [] } }
   );
+  console.log("prompts cleared")
   await userCollection.updateOne(
     { email: email },
     { $set: { answersArray: [] } }
   );
+  console.log("answers cleared")
   res.render("initialRecommend", {
     stylesheetPath: ["./styles/initialRecommend.css"],
   });
@@ -637,10 +640,11 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     return res.redirect("/initialRecommend");
   }
   const email = req.session.email;
-  const user = await userModel.findOne({ email: email });
+  const user = await userCollection.findOne({ email: email });
   const promptsArray = user.promptsArray;
   const answersArray = user.answersArray;
-  let message = prompts.system;
+  let message = []
+  message.push(prompts.system);
   for (let i = 0; i < promptsArray.length; i++) {
     message.push({ role: "assistant", content: promptsArray[i] });
     if (i < promptsArray.length - 1) {
@@ -703,17 +707,21 @@ app.get(
   recommenderAuthenticator,
   async (req, res) => {
     const email = req.session.email;
-    const user = await userModel.findOne({ email: email });
+    const user = await userCollection.findOne({ email: email });
     const answersArray = user.answersArray;
+    console.log("answersArray:", answersArray)
     const promptsArray = user.promptsArray;
+    console.log("promptsArray:", promptsArray)
     req.session.count = req.session.count + 1;
-    let message = null;
+    console.log("session counts:", req.session.count)
+    let message = [];
+    console.log("initial message:", message)
     if (req.session.count == 1) {
-      message = prompts.system;
+      message.push(prompts.system)
       message.push(prompts.storyPrompt1)
     } else if (req.session.count == 2) {
       const keywordsList = prompts.determineKeywords(req.session.genre)
-      message = prompts.system;
+      message.push(prompts.system)
       for (let i = 0; i < promptsArray.length; i++) {
         message.push({ role: "assistant", content: promptsArray[i] });
         message.push({ role: "user", content: answersArray[i] });
@@ -721,14 +729,14 @@ app.get(
       prompts.storyPrompt2.content += `Use one of these keywords for each choice: ${keywordsList[0]}, ${keywordsList[1]}, ${keywordsList[2]}, ${keywordsList[3]}, ${keywordsList[4]}`
       message.push(prompts.storyPrompt2);
     } else if (req.session.count == 3) {
-      message = prompts.system;
+      message.push(prompts.system)
       for (let i = 0; i < promptsArray.length; i++) {
         message.push({ role: "assistant", content: promptsArray[i] });
         message.push({ role: "user", content: answersArray[i] });
       }
       message.push(prompts.storyPrompt3);
     } else if (req.session.count == 4) {
-      message = prompts.system;
+      message.push(prompts.system)
       for (let i = 0; i < promptsArray.length; i++) {
         message.push({ role: "assistant", content: promptsArray[i] });
         message.push({ role: "user", content: answersArray[i] });
@@ -740,6 +748,7 @@ app.get(
 
     let content;
     let splitContent;
+    console.log("message:", message)
     try {
       content = await gpt(message);
     } catch (err) {
@@ -750,10 +759,26 @@ app.get(
     if (req.session.count < 4) {
       try {;
         splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+        let attempts = 0;
+        while (splitContent.length < 3 && attempts < 5) {
+          try {
+            content = await gpt(message);
+          } catch (err) {
+            console.log('could not get content');
+            return res.redirect("/initialRecommend");
+          }
+          try {;
+            splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+          } catch (err) {
+            console.log('could not split content');
+            return res.redirect("/initialRecommend");
+          } 
+        }
       } catch (err) {
         console.log('could not split content');
         return res.redirect("/initialRecommend");
       } 
+      console.log("splitContent:", splitContent)
     } else {
       splitContent = [content]
     }

@@ -26,8 +26,7 @@ const determineKeywords = (genre) => {
 };
 
 
-const system = [
-  {
+system = {
     role: "system",
     content: `
     You are an interactive narrative story teller. You will generate a story prompt for the user followed by 5 choices that the user can choose from. You will be given a set of rules and context to follow for each section of the story. After you have generated 3 story prompts along with their choices, you will conclude the story.
@@ -40,8 +39,7 @@ const system = [
     Each choice must be between 7 to 12 words and be a single sentence.
     Choices must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
     `,
-  },
-];
+}
 
 storyPrompt1 = {
   role: "system",
