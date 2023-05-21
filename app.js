@@ -408,29 +408,32 @@ app.post(
 
       // Delete the uploaded file from the local filesystem
       fs.unlinkSync(req.file.path);
+      console.log("Photo deleted locally")
 
       // Retrieve the current profile picture file path from the user document
       const user = await userModel.findOne({ email });
       const currentProfilePic = user.profilePic;
+      console.log("Photo retrieved from database")
 
       // Check if the current profile picture file path exists and is different from the new file path
-      if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
-        // Extract the file name from the current profile picture file path
-        const currentFileName = currentProfilePic.substring(1);
+      // if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
+      //   // Extract the file name from the current profile picture file path
+      //   const currentFileName = currentProfilePic.substring(1);
 
-        // Delete the old profile picture file from Backblaze B2
-        await b2.deleteFileVersion({
-          bucketId: backblaze_bucket,
-          fileName: currentFileName,
-        });
-        console.log("Old profile picture file deleted:", currentFileName);
-      }
+      //   // Delete the old profile picture file from Backblaze B2
+      //   // await b2.deleteFileVersion({
+      //   //   bucketId: backblaze_bucket,
+      //   //   fileName: currentFileName,
+      //   // });
+      //   // console.log("Old profile picture file deleted:", currentFileName);
+      // }
 
       // Update the user's profilePic field in the database with the new file path
       await userCollection.updateOne(
         { email },
         { $set: { profilePic: `/${fileName}` } }
       );
+      console.log("Photo path updated in database") 
 
       // Redirect to the profile page or display a success message
       res.redirect("/profile");
