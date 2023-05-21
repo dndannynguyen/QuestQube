@@ -668,7 +668,18 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     console.log("final attempts:", attempts)
   }
   if (attempts >= 5) {
-    return res.redirect("/initialRecommend");
+    options = [
+      "The Witcher 3: Wild Hunt",
+      "Little big planet 2",
+      "Minecraft",
+      "The Last of Us",
+      "Old School RuneScape",
+      "The Legend of Zelda: Breath of the Wild",
+      "The Elder Scrolls V: Skyrim",
+      "Fortnite",
+      "Super Mario Odyssey",
+      "Rayman 2: The Great Escape"
+    ]
   }
   options = options.map(function (option) {
     return option.replace(/\n/g, "");
