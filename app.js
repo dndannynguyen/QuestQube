@@ -197,7 +197,6 @@ app.get("/", (req, res) => {
   const stylesheets = ["/styles/index.css", "/styles/foot.css"];
   res.render("index", { stylesheets });
 });
-
 // LOGIN SUBMIT PAGE
 app.post("/loginSubmit", async (req, res) => {
   const schema = joi.object({
@@ -408,32 +407,29 @@ app.post(
 
       // Delete the uploaded file from the local filesystem
       fs.unlinkSync(req.file.path);
-      console.log("Photo deleted locally")
 
       // Retrieve the current profile picture file path from the user document
       const user = await userModel.findOne({ email });
       const currentProfilePic = user.profilePic;
-      console.log("Photo retrieved from database")
 
       // Check if the current profile picture file path exists and is different from the new file path
-      // if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
-      //   // Extract the file name from the current profile picture file path
-      //   const currentFileName = currentProfilePic.substring(1);
+      if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
+        // Extract the file name from the current profile picture file path
+        const currentFileName = currentProfilePic.substring(1);
 
-      //   // Delete the old profile picture file from Backblaze B2
-      //   // await b2.deleteFileVersion({
-      //   //   bucketId: backblaze_bucket,
-      //   //   fileName: currentFileName,
-      //   // });
-      //   // console.log("Old profile picture file deleted:", currentFileName);
-      // }
+        // Delete the old profile picture file from Backblaze B2
+        await b2.deleteFileVersion({
+          bucketId: backblaze_bucket,
+          fileName: currentFileName,
+        });
+        console.log("Old profile picture file deleted:", currentFileName);
+      }
 
       // Update the user's profilePic field in the database with the new file path
       await userCollection.updateOne(
         { email },
         { $set: { profilePic: `/${fileName}` } }
       );
-      console.log("Photo path updated in database") 
 
       // Redirect to the profile page or display a success message
       res.redirect("/profile");
@@ -619,6 +615,7 @@ app.post("/removeWishlist", userAuthenticator, async (req, res) => {
 //INITIAL RECOMMENDER SCREEN
 app.get("/initialRecommend", userAuthenticator, async (req, res) => {
   req.session.count = 0;
+  req.session.genre = 0;
   const email = req.session.email;
   // clear the prompt and answer fields in user collection
   await userCollection.updateOne(
@@ -636,120 +633,62 @@ app.get("/initialRecommend", userAuthenticator, async (req, res) => {
 
 //FINAL RECOMMENDER SCREEN
 app.get("/finalRecommend", userAuthenticator, async (req, res) => {
-  let message = prompts.systemMessage3;
-  console.log("message:", message);
+  if (req.session.count < 3) {
+    return res.redirect("/initialRecommend");
+  }
   const email = req.session.email;
   const user = await userModel.findOne({ email: email });
   const promptsArray = user.promptsArray;
   const answersArray = user.answersArray;
+  let message = prompts.system;
   for (let i = 0; i < promptsArray.length; i++) {
     message.push({ role: "assistant", content: promptsArray[i] });
-    message.push({ role: "user", content: answersArray[i] });
+    if (i < promptsArray.length - 1) {
+      message.push({ role: "user", content: answersArray[i] });
+    }
   }
-  console.log("answersArray:", answersArray);
+  message.push(prompts.recommendPrompt);
+
   let content = await gpt(message);
-  if (!content.startsWith("#")) {
-    const hashtagIndex = content.indexOf("#");
-    if (hashtagIndex !== -1) {
-      content = content.substring(hashtagIndex);
-    }
+
+  try {;
+    splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+  } catch (err) {
+    console.log('could not split content');
+    return res.redirect("/initialRecommend");
   }
-  let attempts = 0;
-  options = content.split(/#\d+\s+/).filter((option) => option !== "");
-  console.log(options.length)
-  console.log(attempts)
-  while (options.length < 9 && attempts < 5) {
-    let content = await gpt(message);
-    options = content.split(/#\d+\s+/).filter((option) => option !== "");
-    attempts++;
-    console.log("options:", options)
-    console.log("final attempts:", attempts)
+
+  if (splitContent.length < 10) {
+    splitContent.push("No more games to recommend");
   }
-  if (attempts >= 5) {
-    options = [
-      "The Witcher 3: Wild Hunt",
-      "Little big planet 2",
-      "Minecraft",
-      "The Last of Us",
-      "Old School RuneScape",
-      "The Legend of Zelda: Breath of the Wild",
-      "The Elder Scrolls V: Skyrim",
-      "Fortnite",
-      "Super Mario Odyssey",
-      "Rayman 2: The Great Escape"
-    ]
-  }
-  options = options.map(function (option) {
-    return option.replace(/\n/g, "");
-  });
-  if (options.length < 9) {
-    while (options.length < 9) {
-      options.push("No more recommendations available");
-    }
-    console.log('pushed')
-  }
-  console.log("options:", options);
-  let game1,
-    game2,
-    game3,
-    game4,
-    game5,
-    game6,
-    game7,
-    game8,
-    game9,
-    game10 = null;
-  let gamesList = [
-    game1,
-    game2,
-    game3,
-    game4,
-    game5,
-    game6,
-    game7,
-    game8,
-    game9,
-    game10,
-  ];
+
+  let game1,game2,game3,game4,game5,game6,game7,game8,game9,game10 = null;
+  let gamesList = [game1,game2,game3,game4,game5,game6,game7,game8,game9,game10];
   let slugArray = [];
   let gameArray = [];
 
-  // Use `map` to create an array of promises
   let promises = gamesList.map(async (game) => {
-    game = options.pop();
-    try {
+    game = splitContent.pop();
     let result = await verifyGame(game);
-    console.log(result);
-    if (result) {
-      slugArray.push(result);
-      gameArray.push(game)
-    }} catch (error) {
-    options = [
-      "The Witcher 3: Wild Hunt",
-      "Little big planet 2",
-      "Minecraft",
-      "The Last of Us",
-      "Old School RuneScape",
-      "The Legend of Zelda: Breath of the Wild",
-      "The Elder Scrolls V: Skyrim",
-      "Fortnite",
-      "Super Mario Odyssey",
-      "Rayman 2: The Great Escape"
-    ]
-    game = options.pop();
-    let result = await verifyGame(game);
-    console.log(result);
     if (result) {
       slugArray.push(result);
       gameArray.push(game)
     }
-  }
   });
   
-  // Wait for all promises to resolve using `Promise.all`
   await Promise.all(promises);
+
+  req.session.count = 0;
+  req.session.genre = 0;
+  await userCollection.updateOne(
+    { email: email },
+    { $set: { promptsArray: [] } }
+  );
+  await userCollection.updateOne(
+    { email: email },
+    { $set: { answersArray: [] } }
+  );
   
-  console.log("finalArray:", slugArray);
   res.render("finalRecommend", {
     slugList: slugArray,
     gamesList: gameArray,
@@ -768,50 +707,64 @@ app.get(
     const answersArray = user.answersArray;
     const promptsArray = user.promptsArray;
     req.session.count = req.session.count + 1;
-    console.log("session cookies equals", req.session.count);
     let message = null;
     if (req.session.count == 1) {
-      message = prompts.systemMessage1;
+      message = prompts.system;
+      message.push(prompts.storyPrompt1)
     } else if (req.session.count == 2) {
-      message = prompts.systemMessage2;
-      const promptFormatted = { role: "assistant", content: promptsArray[0] };
-      const answerFormatted = { role: "user", content: answersArray[0] };
-      message.push(promptFormatted);
-      message.push(answerFormatted);
+      const keywordsList = prompts.determineKeywords(req.session.genre)
+      message = prompts.system;
+      for (let i = 0; i < promptsArray.length; i++) {
+        message.push({ role: "assistant", content: promptsArray[i] });
+        message.push({ role: "user", content: answersArray[i] });
+      }
+      prompts.storyPrompt2.content += `Use one of these keywords for each choice: ${keywordsList[0]}, ${keywordsList[1]}, ${keywordsList[2]}, ${keywordsList[3]}, ${keywordsList[4]}`
+      message.push(prompts.storyPrompt2);
     } else if (req.session.count == 3) {
-      // message = prompts.systemMessage3
-      // const answerFormatted1 = { role: "user", content: answersArray[0] }
-      // const answerFormatted2 = { role: "user", content: answersArray[1] }
-      // message.push(answerFormatted1)
-      // message.push(answerFormatted2)
-      // console.log("checkpoint 3", message)
-      return res.redirect("/finalRecommend");
+      message = prompts.system;
+      for (let i = 0; i < promptsArray.length; i++) {
+        message.push({ role: "assistant", content: promptsArray[i] });
+        message.push({ role: "user", content: answersArray[i] });
+      }
+      message.push(prompts.storyPrompt3);
+    } else if (req.session.count == 4) {
+      message = prompts.system;
+      for (let i = 0; i < promptsArray.length; i++) {
+        message.push({ role: "assistant", content: promptsArray[i] });
+        message.push({ role: "user", content: answersArray[i] });
+      }
+      message.push(prompts.conclusionPrompt);
     } else {
       res.redirect("/initialRecommend");
     }
 
-    let content = await gpt(message);
-
-    if (!content) {
+    let content;
+    let splitContent;
+    try {
+      content = await gpt(message);
+    } catch (err) {
+      console.log('could not get content');
       return res.redirect("/initialRecommend");
     }
 
-    options = content.split(/#\d+\s+/).filter((option) => option !== "");
-    let attempts = 0;
-    while (options.length < 4 && attempts < 5) {
-      let content = await gpt(message);
-      options = content.split(/#\d+\s+/).filter((option) => option !== "");
-      attempts++;
-      console.log("attempts:", attempts);
-      console.log(options)
+    if (req.session.count < 4) {
+      try {;
+        splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+      } catch (err) {
+        console.log('could not split content');
+        return res.redirect("/initialRecommend");
+      } 
+    } else {
+      splitContent = [content]
     }
 
     await userCollection.updateOne(
       { email: email },
-      { $push: { promptsArray: options[0] } }
+      { $push: { promptsArray: splitContent[0] } }
     );
     res.render("promptScreen", {
-      options: options,
+      sessionCount: req.session.count,
+      splitContent: splitContent,
       count: req.session.count,
       stylesheetPath: ["./styles/promptScreen.css", ],
     });
@@ -821,6 +774,7 @@ app.get(
 app.get("/optionProcess", userAuthenticator, async (req, res) => {
   const email = req.session.email;
   const answer = req.query.answer;
+  req.session.genre = req.query.genre - 1;
   await userCollection.updateOne(
     { email: email },
     { $push: { answersArray: answer } }
