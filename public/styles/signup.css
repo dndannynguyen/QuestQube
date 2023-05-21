@@ -1,6 +1,7 @@
 body {
     background-color: #292929;
     color: #D6AD60;
+    
 }
 
 .signup-form {
@@ -68,17 +69,18 @@ label {
     color: gray;
 }
 
-button:focus {
-    outline: none;
+.password-requirements {
+    font-size: 14px;
+    text-align: left;
 }
 
-@media screen and (max-width: 768px) {
-    .signup-form {
-        margin-bottom: 150px;
-    }
+small {
+    font-size: 14px;
+    text-align: left;
+}
 
-    form {
-        width: 80%;
-        margin: auto;
+@media screen and (max-width: 768px){
+    body {
+        margin-bottom: 200px;
     }
 }
