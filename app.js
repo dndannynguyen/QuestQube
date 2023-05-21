@@ -639,9 +639,7 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   let message = prompts.systemMessage3;
   console.log("message:", message);
   const email = req.session.email;
-  // { role: "assistant", content: promptsArray[0] }
   const user = await userModel.findOne({ email: email });
-  console.log(user);
   const promptsArray = user.promptsArray;
   const answersArray = user.answersArray;
   for (let i = 0; i < promptsArray.length; i++) {
@@ -719,12 +717,33 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   // Use `map` to create an array of promises
   let promises = gamesList.map(async (game) => {
     game = options.pop();
+    try {
+    let result = await verifyGame(game);
+    console.log(result);
+    if (result) {
+      slugArray.push(result);
+      gameArray.push(game)
+    }} catch (error) {
+    options = [
+      "The Witcher 3: Wild Hunt",
+      "Little big planet 2",
+      "Minecraft",
+      "The Last of Us",
+      "Old School RuneScape",
+      "The Legend of Zelda: Breath of the Wild",
+      "The Elder Scrolls V: Skyrim",
+      "Fortnite",
+      "Super Mario Odyssey",
+      "Rayman 2: The Great Escape"
+    ]
+    game = options.pop();
     let result = await verifyGame(game);
     console.log(result);
     if (result) {
       slugArray.push(result);
       gameArray.push(game)
     }
+  }
   });
   
   // Wait for all promises to resolve using `Promise.all`

@@ -94,6 +94,7 @@ const systemMessage3 = [
     I want 10 recommendations based on the prompts and answers that I like.
 
     Rules:
+    Do not continue the story in your response.
     Final recommendations must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
     Do not include any dialogue before or after the recommendations.
     Keep the word count below 150.
