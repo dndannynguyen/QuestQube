@@ -408,29 +408,32 @@ app.post(
 
       // Delete the uploaded file from the local filesystem
       fs.unlinkSync(req.file.path);
+      console.log("Photo deleted locally")
 
       // Retrieve the current profile picture file path from the user document
       const user = await userModel.findOne({ email });
       const currentProfilePic = user.profilePic;
+      console.log("Photo retrieved from database")
 
       // Check if the current profile picture file path exists and is different from the new file path
-      if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
-        // Extract the file name from the current profile picture file path
-        const currentFileName = currentProfilePic.substring(1);
+      // if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
+      //   // Extract the file name from the current profile picture file path
+      //   const currentFileName = currentProfilePic.substring(1);
 
-        // Delete the old profile picture file from Backblaze B2
-        await b2.deleteFileVersion({
-          bucketId: backblaze_bucket,
-          fileName: currentFileName,
-        });
-        console.log("Old profile picture file deleted:", currentFileName);
-      }
+      //   // Delete the old profile picture file from Backblaze B2
+      //   // await b2.deleteFileVersion({
+      //   //   bucketId: backblaze_bucket,
+      //   //   fileName: currentFileName,
+      //   // });
+      //   // console.log("Old profile picture file deleted:", currentFileName);
+      // }
 
       // Update the user's profilePic field in the database with the new file path
       await userCollection.updateOne(
         { email },
         { $set: { profilePic: `/${fileName}` } }
       );
+      console.log("Photo path updated in database") 
 
       // Redirect to the profile page or display a success message
       res.redirect("/profile");
@@ -636,9 +639,7 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   let message = prompts.systemMessage3;
   console.log("message:", message);
   const email = req.session.email;
-  // { role: "assistant", content: promptsArray[0] }
   const user = await userModel.findOne({ email: email });
-  console.log(user);
   const promptsArray = user.promptsArray;
   const answersArray = user.answersArray;
   for (let i = 0; i < promptsArray.length; i++) {
@@ -665,7 +666,18 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     console.log("final attempts:", attempts)
   }
   if (attempts >= 5) {
-    return res.redirect("/initialRecommend");
+    options = [
+      "The Witcher 3: Wild Hunt",
+      "Little big planet 2",
+      "Minecraft",
+      "The Last of Us",
+      "Old School RuneScape",
+      "The Legend of Zelda: Breath of the Wild",
+      "The Elder Scrolls V: Skyrim",
+      "Fortnite",
+      "Super Mario Odyssey",
+      "Rayman 2: The Great Escape"
+    ]
   }
   options = options.map(function (option) {
     return option.replace(/\n/g, "");
@@ -705,12 +717,33 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   // Use `map` to create an array of promises
   let promises = gamesList.map(async (game) => {
     game = options.pop();
+    try {
+    let result = await verifyGame(game);
+    console.log(result);
+    if (result) {
+      slugArray.push(result);
+      gameArray.push(game)
+    }} catch (error) {
+    options = [
+      "The Witcher 3: Wild Hunt",
+      "Little big planet 2",
+      "Minecraft",
+      "The Last of Us",
+      "Old School RuneScape",
+      "The Legend of Zelda: Breath of the Wild",
+      "The Elder Scrolls V: Skyrim",
+      "Fortnite",
+      "Super Mario Odyssey",
+      "Rayman 2: The Great Escape"
+    ]
+    game = options.pop();
     let result = await verifyGame(game);
     console.log(result);
     if (result) {
       slugArray.push(result);
       gameArray.push(game)
     }
+  }
   });
   
   // Wait for all promises to resolve using `Promise.all`

@@ -39,7 +39,7 @@ const systemMessage1 = [
     Options must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
     
     Prompt 1 Context:
-    The initial prompt should be that you are at an adventurers guild looking for a quest. The answers should be in the form of 5 people at the job market that you want to follow. The answers should pertain to these 5 genres: action, adventure, strategy, simulation, sports/racing.
+    The initial prompt should be that you are at an adventurers guild looking for a quest. The answers should be in the form of 5 people in the guild that you want to follow. The answers should pertain to these 5 genres: action, adventure, strategy, simulation, sports/racing.
     
     What is the first prompt?
     `,
@@ -94,6 +94,7 @@ const systemMessage3 = [
     I want 10 recommendations based on the prompts and answers that I like.
 
     Rules:
+    Do not continue the story in your response.
     Final recommendations must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
     Do not include any dialogue before or after the recommendations.
     Keep the word count below 150.
