@@ -19,14 +19,19 @@ include("templates/nav") %>
       </div>
       <div class="options">
         <h1><%= gamesList[i] %></h1>
-        <a href="#" style="--clr: #fceabb"><span>View Details</span><i></i></a>
-        <a href="#" style="--clr: #fceabb"
-          ><span>Add to Wishlist</span><i></i
-        ></a>
+        <!-- <form id="wishlist-form" action="/verifyWishlist" method="post"> -->
+          <input type="hidden" name="game" value="<%= gamesList[i] %>" />
+          <a onclick="submitForm()" style="--clr: #fceabb"><span>Add to Wishlist</span><i></i></a>
+        <!-- </form> -->
       </div>
     </div>
     <script>
       scrapeImages('<%= slugList[i] %>', 'game-image-<%= i %>'); 
+    </script>
+    <script>
+      function submitForm() {
+        document.getElementById("wishlist-form").submit();
+      }
     </script>
     <% } %>
   </div>
