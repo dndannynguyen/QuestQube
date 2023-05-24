@@ -93,6 +93,14 @@ const recommenderAuthenticator = (req, res, next) => {
   next();
 };
 
+// ALREADY LOGGED IN MIDDLEWARE
+const loggedIn = (req, res, next) => {
+  if (req.session.GLOBAL_AUTHENTICATION) {
+    return res.redirect("/profile");
+  }
+  next();
+};
+
 // Get Profile Picture
 const getProfilePic = async (email) => {
   try {
@@ -112,13 +120,19 @@ const getProfilePic = async (email) => {
   }
 };
 
+// INDEX PAGE
+app.get("/", (req, res) => {
+  const stylesheets = ["/styles/index.css", "/styles/foot.css"];
+  res.render("index", { stylesheets });
+});
+
 // SIGN UP PAGE
-app.get("/signup", (req, res) => {
+app.get("/signup", loggedIn, (req, res) => {
   res.render("signup", { stylesheetPath: ["./styles/login.css"] });
 });
 
 // SIGN UP SUBMIT PAGE
-app.post("/signupSubmit", async (req, res) => {
+app.post("/signupSubmit", loggedIn, async (req, res) => {
   const schema = joi.object({
     username: joi.string().required(),
     name: joi.string().required(),
@@ -208,16 +222,12 @@ app.post("/signupSubmit", async (req, res) => {
 });
 
 // LOGIN PAGE
-app.get("/login", (req, res) => {
+app.get("/login", loggedIn, (req, res) => {
   res.render("login", { stylesheetPath: ["/styles/login.css"] });
 });
 
-app.get("/", (req, res) => {
-  const stylesheets = ["/styles/index.css", "/styles/foot.css"];
-  res.render("index", { stylesheets });
-});
 // LOGIN SUBMIT PAGE
-app.post("/loginSubmit", async (req, res) => {
+app.post("/loginSubmit", loggedIn, async (req, res) => {
   const schema = joi.object({
     email: joi.string().email().required(),
     password: joi.string().required(),
@@ -247,11 +257,11 @@ app.post("/loginSubmit", async (req, res) => {
   }
 });
 
-app.get("/forgotPassword", async (req, res) => {
+app.get("/forgotPassword", loggedIn, async (req, res) => {
   res.render("forgotPassword", { stylesheetPath: ["./styles/login.css"] });
 });
 
-app.post("/securityQuestion", async (req, res) => {
+app.post("/securityQuestion", loggedIn, async (req, res) => {
   const email = req.body.email;
   req.session.email = email;
   const user = await userCollection.findOne({ email: email });
