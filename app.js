@@ -762,7 +762,7 @@ app.get(
       }
       message.push(prompts.conclusionPrompt);
     } else {
-      res.redirect("/initialRecommend");
+      return res.redirect("/initialRecommend");
     }
 
     let content;
@@ -772,12 +772,12 @@ app.get(
       content = await gpt(message);
     } catch (err) {
       console.log('could not get content');
-      return res.redirect("/initialRecommend");
+      // Display alert and redirect
+      return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
     }
 
     if (req.session.count < 4) {
       try {
-        ;
         splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
         let attempts = 0;
         while (splitContent.length < 3 && attempts < 5) {
@@ -785,30 +785,26 @@ app.get(
             content = await gpt(message);
           } catch (err) {
             console.log('could not get content');
-            return res.redirect("/initialRecommend");
+            return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
           }
           try {
-            ;
             splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
           } catch (err) {
             console.log('could not split content');
-            return res.redirect("/initialRecommend");
+            return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
           }
         }
       } catch (err) {
         console.log('could not split content');
-        return res.redirect("/initialRecommend");
+        return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
       }
       console.log("splitContent:", splitContent)
     } else {
       if (content.includes('.')) {
         let middleIndex = Math.floor(content.length / 2);
-
         let closestPeriodIndex = content.indexOf('.', middleIndex);
-        
         let paragraph1 = content.substring(0, closestPeriodIndex + 1);
         let paragraph2 = content.substring(closestPeriodIndex + 1);
-        
         splitContent = [paragraph1, paragraph2]; 
       } else {
         splitContent = [content]
@@ -827,6 +823,7 @@ app.get(
     });
   }
 );
+
 
 app.get("/optionProcess", userAuthenticator, async (req, res) => {
   const email = req.session.email;
