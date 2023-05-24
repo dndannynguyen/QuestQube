@@ -101,6 +101,12 @@ background-color: #d8c690;
     height: 10rem;
 }
 
+label{
+    margin-left: 40px;
+    font-size: 15px;
+}
+
+
 @media screen and (max-width: 768px){
     #dropdown {
             width: 80%;
@@ -112,14 +118,20 @@ background-color: #d8c690;
             font-size: 18px;
             color: gray;
         }
+        label{
+            margin-left: 40px;
+            font-size: 20px;
+        }
+        #passwordRequirements,
+        #passwordMatchError {
+            font-size: 16px;
+            margin-left: 40px;
+        }
         .profile-container{
             margin-bottom: 100px;
         }
         .form-control{
             width: 80%;
-            margin-left: 40px;
-        }
-        label{
             margin-left: 40px;
         }
         button{
