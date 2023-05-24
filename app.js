@@ -312,9 +312,14 @@ app.get("/user/", userAuthenticator, async (req, res) => {
     const profilePic = result[0].profilePic;
     const favourites = result[0].favourites;
     const wishlist = result[0].wishlist;
+    const email = result[0].email;
+    let profilePicUrl = null;
+    if (profilePic) {
+      profilePicUrl = await getProfilePic(email);
+    }
     res.render("user", {
       username: username,
-      profilePic: profilePic,
+      profilePic: profilePicUrl,
       favourites: favourites,
       wishlist: wishlist,
       stylesheetPath: "./styles/profile.css",
