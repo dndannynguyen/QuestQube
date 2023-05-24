@@ -313,11 +313,16 @@ app.get("/user/", userAuthenticator, async (req, res) => {
     const favourites = result[0].favourites;
     const wishlist = result[0].wishlist;
     const email = result[0].email;
+    const dob = result[0].dob;
+    const name = result[0].name;
     let profilePicUrl = null;
     if (profilePic) {
       profilePicUrl = await getProfilePic(email);
     }
     res.render("user", {
+      email: email,
+      dob: dob,
+      name: name,
       username: username,
       profilePic: profilePicUrl,
       favourites: favourites,

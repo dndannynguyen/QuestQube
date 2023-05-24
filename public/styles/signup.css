@@ -36,7 +36,7 @@ input[type="date"] {
 }
 
 label {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     display: inline-block;
     text-align: left;
@@ -69,13 +69,14 @@ label {
     color: gray;
 }
 
-.password-requirements {
-    font-size: 14px;
+.password-requirements,
+#passwordMatchError {
+    font-size: 20px;
     text-align: left;
 }
 
 small {
-    font-size: 14px;
+    font-size: 16px;
     text-align: left;
 }
 
@@ -83,4 +84,10 @@ small {
     body {
         margin-bottom: 200px;
     }
+
+    .password-requirements,
+    #passwordMatchError {
+    font-size: 16px;
+    text-align: left;
+}   
 }
