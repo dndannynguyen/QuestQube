@@ -100,7 +100,7 @@ conclusionPrompt = {
   role: "system",
   content: `
   Conclusion Prompt Context:
-  Use the previous choices and prompts to conclude the story. The conclusion must be interesting and have a unique, happy ending. The conclusion must be less than 100 words. Do not give any choices to the user.
+  Use the previous choices and prompts to conclude the story. The conclusion must be interesting and have a unique, happy ending. The conclusion must be less than 75 words. Do not give any choices to the user.
 
   Desired format:
   Conclusion goes here.
