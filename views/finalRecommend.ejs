@@ -1,34 +1,100 @@
-<%- include("templates/head", { stylesheetPath:
-['/styles/finalRecommend.css','/styles/nav.css','/styles/foot.css'] }) %> <%-
-include("templates/nav") %>
-<script src="/scripts/scrapeImages.js"></script>
-<div class="content">
-  <div>
-    <p class="p1">Congrats on finishing your adventure!</p>
-  </div>
-  <div>
-    <p class="p2">
-      Based on your chosen adventure, we recommend the following games:
-    </p>
-  </div>
-  <div class="game-cards">
-    <% for (let i = 0; i < 3; i++) { %>
-    <div class="game-info">
-      <div class="picture">
-        <img id="game-image-<%= i %>" src="" alt="" />
-      </div>
-      <div class="options">
-        <h1><%= gamesList[i] %></h1>
-        <a href="#" style="--clr: #fceabb"><span>View Details</span><i></i></a>
-        <a href="#" style="--clr: #fceabb"
-          ><span>Add to Wishlist</span><i></i
-        ></a>
-      </div>
+  <%- include("templates/head", { stylesheetPath: ['/styles/finalRecommend.css','/styles/nav.css','/styles/foot.css'] }) %> <%-
+  include("templates/nav") %>
+  <script src="/scripts/scrapeImages.js"></script>
+  <div class="content">
+    <div>
+      <p class="p1">Congrats on finishing your adventure!</p>
     </div>
-    <script>
-      scrapeImages('<%= slugList[i] %>', 'game-image-<%= i %>'); 
-    </script>
-    <% } %>
+    <div>
+      <p class="p2">Based on your chosen adventure, we recommend the following games:</p>
+    </div>
+    <div class="game-cards">
+      <% for (let i = 0; i < 3; i++) { %>
+      <div class="game-info" id="game-card-<%= i %>">
+        <div class="picture">
+          <img id="game-image-<%= i %>" src="" alt="" />
+        </div>
+        <div class="options">
+          <h1><%= gamesList[i] %></h1>
+          <button onclick="recommendNewGame(<%= i %>, `<%- JSON.stringify(slugList) %>`, `<%- JSON.stringify(gamesList) %>`);">Recommend a new game</button>
+        </div>
+      </div>
+      <script>
+        scrapeImages('<%= slugList[i] %>', 'game-image-<%= i %>'); 
+      </script>
+      <% } %>
+    </div>
   </div>
-</div>
-<%- include("templates/foot") %>
+
+  <script>
+    var currentIndex = 3; // Track the current index of the game card
+    var recommendationCount = 0; // Track the number of recommendations
+    var lastRecommendedIndex = -1; // Track the index of the last recommended game
+    
+    function recommendNewGame(index, slugList, gamesList) {
+      console.log("function started")
+      currentIndex++; // Increment the current index
+      
+      if (currentIndex >= gamesList.length) {
+        currentIndex = 3; // Wrap around to the beginning if reached the end
+      }
+      
+      if (index === lastRecommendedIndex) {
+        recommendNewGame(index, '<%= slugList %>'); // Recommend a new game again if it's the same as the last one
+        return;
+      }
+      
+      var newIndex = currentIndex;
+      
+      if (recommendationCount >= 3) {
+        alert('Sorry, please play the game again for more recommendations.');
+        return;
+      }
+      
+      // Retrieve the container element of the current game card
+      var currentCard = document.getElementById(`game-card-${index}`);
+      
+      // Create a new game card element with the recommended game
+      var newCard = document.createElement('div');
+      newCard.className = 'game-info';
+      newCard.id = `game-card-${newIndex}`;
+      
+      // Create the picture div and image element
+      var pictureDiv = document.createElement('div');
+      pictureDiv.className = 'picture';
+      var image = document.createElement('img');
+      image.id = `game-image-${newIndex}`;
+      image.src = '';
+      image.alt = '';
+      pictureDiv.appendChild(image);
+      newCard.appendChild(pictureDiv);
+      
+      // Create the options div and h1 element
+      var optionsDiv = document.createElement('div');
+      optionsDiv.className = 'options';
+      var heading = document.createElement('h1');
+      heading.textContent = gamesList[newIndex];
+      optionsDiv.appendChild(heading);
+      
+      // Create the "Recommend a new game" button
+      var button = document.createElement('button');
+      button.textContent = 'Recommend a new game';
+      button.onclick = function() {
+        recommendNewGame(newIndex);
+      };
+      optionsDiv.appendChild(button);
+      
+      newCard.appendChild(optionsDiv);
+      
+      // Replace the current game card with the new one
+      currentCard.parentNode.replaceChild(newCard, currentCard);
+      
+      // Perform the necessary operations for the new game card
+      scrapeImages(slugList[newIndex], `game-image-${newIndex}`);
+      
+      recommendationCount++; // Increment the recommendation count
+      lastRecommendedIndex = newIndex; // Update the last recommended index
+    }
+  </script>
+
+  <%- include("templates/foot") %>

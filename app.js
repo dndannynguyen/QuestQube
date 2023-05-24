@@ -666,6 +666,8 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     splitContent.push("No more games to recommend");
   }
 
+  console.log("splitContent:", splitContent)
+
   let game1,game2,game3,game4,game5,game6,game7,game8,game9,game10 = null;
   let gamesList = [game1,game2,game3,game4,game5,game6,game7,game8,game9,game10];
   let slugArray = [];
@@ -682,16 +684,18 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   
   await Promise.all(promises);
 
-  req.session.count = 0;
-  req.session.genre = 0;
-  await userCollection.updateOne(
-    { email: email },
-    { $set: { promptsArray: [] } }
-  );
-  await userCollection.updateOne(
-    { email: email },
-    { $set: { answersArray: [] } }
-  );
+  // req.session.count = 0;
+  // req.session.genre = 0;
+  // await userCollection.updateOne(
+  //   { email: email },
+  //   { $set: { promptsArray: [] } }
+  // );
+  // await userCollection.updateOne(
+  //   { email: email },
+  //   { $set: { answersArray: [] } }
+  // );
+  console.log("gameArray:", gameArray)
+  console.log("slugArray:", slugArray)
   
   res.render("finalRecommend", {
     slugList: slugArray,
