@@ -1,68 +1,69 @@
-<%- include("templates/head", { stylesheetPath:
-['/styles/signup.css','/styles/nav.css','/styles/foot.css'] }) %> <%- include("templates/nav") %>
+<%- include("templates/head", { stylesheetPath: ['/styles/signup.css','/styles/nav.css','/styles/foot.css'] }) %>
+<%- include("templates/nav") %>
 <div class="signup-form">
   <h1>Sign up</h1>
   <br />
   <form action="/signupSubmit" method="post">
-    <label for="username">Username</label>
+    <p class="d-flex">* indicates a required field</p>
+    <label for="username">Username <span class="required-text">*</span></label>
     <input name="username" type="text" placeholder="username" required/>
     <br />
     <br />
-    <label for="name">Name</label>
+    <label for="name">Name <span class="required-text">*</span></label>
     <input name="name" type="text" placeholder="name" required/>
     <br />
     <br />
-    <label for="email">Email</label>
+    <label for="email">Email <span class="required-text">*</span></label>
     <input name="email" type="email" placeholder="email" required/>
     <br />
     <br />
-    <label for="password">Password <br> <p style="font-size:x-small;">(*Must be at least 8 characters long with at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.)</p></label>
+    <label for="password">Password *<br> <p style="font-size:x-small;">(*Must be at least 8 characters long with at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.)</p> <span class="required-text"></span></label>
     <input type="password" name="password" id="password" placeholder="password" required/>
     <div id="passwordRequirements" class="password-requirements"></div>
     <br />
     <br />
-    <label for="account-confirm-pass">Confirm Password</label>
+    <label for="confirmPassword">Confirm Password <span class="required-text">*</span></label>
     <input class="form-control" type="password" name="confirmPassword" id="confirmPassword" placeholder="confirm password" required/>
     <small id="passwordMatchError" style="color: red; display: none;">Passwords do not match.</small>
     <br />
-    <label for="dob">Date of Birth</label>
+    <label for="dob">Date of Birth <span class="required-text">*</span></label>
     <input name="dob" type="date" placeholder="DOB" required/>
     <br />
     <br />
     
-      <label for="securityQuestion">Security Question?</label>
-      <select name="security_question" id="dropdown" required>
-        <option value="" disabled selected>
-          Select your security question
-        </option>
-        <option value="Where was your mother born?">
-          Where was your mother born?
-        </option>
-        <option value="What was your first car?">
-          What was your first car?
-        </option>
-        <option value="What was the first name of your first pet?">
-          What was the first name of your first pet?
-        </option>
-        <option value="What was your school name?">
-          What was your school name?
-        </option>
-        <option value="Where were you born?">Where were you born?</option>
-        <option value="What model your first smartphone was?">
-          What model your first smartphone was?
-        </option>
-      </select>
+    <label for="securityQuestion">Security Question? <span class="required-text">*</span></label>
+    <select name="security_question" id="dropdown" required>
+      <option value="" disabled selected>
+        Select your security question
+      </option>
+      <option value="Where was your mother born?">
+        What model was your first smartphone?
+      </option>
+      <option value="What was your first car?">
+        What was the first name of your first pet?
+      </option>
+      <option value="What was the first name of your first pet?">
+        What was your first car?
+      </option>
+      <option value="What was your school name?">
+        What was your school name?
+      </option>
+      <option value="Where were you born?">Where were you born?</option>
+      <option value="What model your first smartphone was?">
+        Where was your mother born?
+      </option>
+    </select>
     <br><br>
     
-      <label for="secQuestAnswer">Type your security question here</label>
-      <input
-        type="text"
-        class="form-control"
-        name="security_answer"
-        placeholder="Answer here"
-        required
-      />
-   <br>
+    <label for="secQuestAnswer">Type your security question here <span class="required-text">*</span></label>
+    <input
+      type="text"
+      class="form-control"
+      name="security_answer"
+      placeholder="Answer here"
+      required
+    />
+    <br>
     <button id="Submit" class="btn btn-success"><b>Submit</b></button>
   </form>
 </div>
