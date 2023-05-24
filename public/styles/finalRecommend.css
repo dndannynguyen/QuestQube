@@ -60,7 +60,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px
+    gap: 20px;
 }
 
 .game-info {
@@ -68,7 +68,7 @@ body {
     flex-direction: row;
     border: 1px solid #FBDC6A;
     border-radius: 10px;
-
+    width: 100%;
 
 }
 
