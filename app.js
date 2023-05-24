@@ -93,13 +93,46 @@ const recommenderAuthenticator = (req, res, next) => {
   next();
 };
 
+// ALREADY LOGGED IN MIDDLEWARE
+const loggedIn = (req, res, next) => {
+  if (req.session.GLOBAL_AUTHENTICATION) {
+    return res.redirect("/profile");
+  }
+  next();
+};
+
+// Get Profile Picture
+const getProfilePic = async (email) => {
+  try {
+    // Authorize with Backblaze B2
+    await b2.authorize();
+
+    // Get the bucket information
+    let response = await b2.getBucket({ bucketName: backblaze_name });
+
+    const profilePicFileName = `${email}/Profile_Picture.jpg`;
+    const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}?${Date.now()}`;
+    return profilePicUrl;
+  } catch (error) {
+    console.error("Error connecting to Backblaze:", error);
+    profilePicUrl = null;
+    return profilePicUrl;
+  }
+};
+
+// INDEX PAGE
+app.get("/", (req, res) => {
+  const stylesheets = ["/styles/index.css", "/styles/foot.css"];
+  res.render("index", { stylesheets });
+});
+
 // SIGN UP PAGE
-app.get("/signup", (req, res) => {
+app.get("/signup", loggedIn, (req, res) => {
   res.render("signup", { stylesheetPath: ["./styles/login.css"] });
 });
 
 // SIGN UP SUBMIT PAGE
-app.post("/signupSubmit", async (req, res) => {
+app.post("/signupSubmit", loggedIn, async (req, res) => {
   const schema = joi.object({
     username: joi.string().required(),
     name: joi.string().required(),
@@ -189,16 +222,12 @@ app.post("/signupSubmit", async (req, res) => {
 });
 
 // LOGIN PAGE
-app.get("/login", (req, res) => {
+app.get("/login", loggedIn, (req, res) => {
   res.render("login", { stylesheetPath: ["/styles/login.css"] });
 });
 
-app.get("/", (req, res) => {
-  const stylesheets = ["/styles/index.css", "/styles/foot.css"];
-  res.render("index", { stylesheets });
-});
 // LOGIN SUBMIT PAGE
-app.post("/loginSubmit", async (req, res) => {
+app.post("/loginSubmit", loggedIn, async (req, res) => {
   const schema = joi.object({
     email: joi.string().email().required(),
     password: joi.string().required(),
@@ -228,11 +257,11 @@ app.post("/loginSubmit", async (req, res) => {
   }
 });
 
-app.get("/forgotPassword", async (req, res) => {
+app.get("/forgotPassword", loggedIn, async (req, res) => {
   res.render("forgotPassword", { stylesheetPath: ["./styles/login.css"] });
 });
 
-app.post("/securityQuestion", async (req, res) => {
+app.post("/securityQuestion", loggedIn, async (req, res) => {
   const email = req.body.email;
   req.session.email = email;
   const user = await userCollection.findOne({ email: email });
@@ -283,9 +312,14 @@ app.get("/user/", userAuthenticator, async (req, res) => {
     const profilePic = result[0].profilePic;
     const favourites = result[0].favourites;
     const wishlist = result[0].wishlist;
+    const email = result[0].email;
+    let profilePicUrl = null;
+    if (profilePic) {
+      profilePicUrl = await getProfilePic(email);
+    }
     res.render("user", {
       username: username,
-      profilePic: profilePic,
+      profilePic: profilePicUrl,
       favourites: favourites,
       wishlist: wishlist,
       stylesheetPath: "./styles/profile.css",
@@ -303,53 +337,19 @@ app.get("/profile", userAuthenticator, async (req, res) => {
   const dob = result[0].dob;
   const profilePic = result[0].profilePic;
 
+  let profilePicUrl = null;
   if (profilePic) {
-    // Connect to Backblaze B2 storage
-    const b2 = new B2({
-      applicationKeyId: backblaze_account,
-      applicationKey: backblaze_API,
-    });
-
-    try {
-      // Authorize with Backblaze B2
-      await b2.authorize();
-
-      // Get the bucket information
-      let response = await b2.getBucket({ bucketName: backblaze_name });
-      const bucketInfo = response.data;
-
-      const profilePicFileName = `${email}/Profile_Picture.jpg`;
-      const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}?${Date.now()}`;
-
-      res.render("profile", {
-        username,
-        name,
-        email,
-        dob,
-        profilePic: profilePicUrl,
-        stylesheetPath: "./styles/profile.css",
-      });
-    } catch (error) {
-      console.error("Error connecting to Backblaze:", error);
-      res.render("profile", {
-        username,
-        name,
-        email,
-        dob,
-        profilePic,
-        stylesheetPath: "./styles/profile.css",
-      });
-    }
-  } else {
-    res.render("profile", {
-      username,
-      name,
-      email,
-      dob,
-      profilePic,
-      stylesheetPath: "./styles/profile.css",
-    });
+    profilePicUrl = await getProfilePic(email);
   }
+
+  res.render("profile", {
+    username,
+    name,
+    email,
+    dob,
+    profilePic: profilePicUrl,
+    stylesheetPath: "./styles/profile.css",
+  });
 });
 
 app.post(
@@ -431,8 +431,9 @@ app.post(
         { $set: { profilePic: `/${fileName}` } }
       );
 
-      // Redirect to the profile page or display a success message
-      res.redirect("/profile");
+      // Redirect to the previous page
+      const previousPage = req.headers.referer || "/";
+      res.redirect(previousPage);
     } catch (error) {
       console.error("Error uploading image:", error);
       // Handle the error accordingly
@@ -536,10 +537,16 @@ app.get("/favourites", userAuthenticator, async (req, res) => {
   const user = await userModel.findOne({ email: email });
   const profilePic = user.profilePic;
   const success = req.query.success;
+
+  let profilePicUrl = null;
+  if (profilePic) {
+    profilePicUrl = await getProfilePic(email);
+  }
+
   res.render("favourites", {
     stylesheetPath: ["/styles/favourites.css", "/styles/profile.css"],
     favourites: user.favourites,
-    profilePic: profilePic,
+    profilePic: profilePicUrl,
     success: success,
   });
 });
@@ -577,10 +584,16 @@ app.get("/wishlist", userAuthenticator, async (req, res) => {
   const user = await userModel.findOne({ email: email });
   const profilePic = user.profilePic;
   const success = req.query.success;
+
+  let profilePicUrl = null;
+  if (profilePic) {
+    profilePicUrl = await getProfilePic(email);
+  }
+
   res.render("wishlist", {
     stylesheetPath: ["/styles/wishlist.css", "/styles/profile.css"],
     wishlist: user.wishlist,
-    profilePic: profilePic,
+    profilePic: profilePicUrl,
     success: success,
   });
 });

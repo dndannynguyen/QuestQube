@@ -49,6 +49,8 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    width: 100%;
+    text-align: center;
 }
 
 .prompt p {
@@ -71,6 +73,7 @@ body {
     border-radius: 10px;
     transition: 0.5s;
     margin-bottom: 10px;
+    width:100%
 }
 
 .prompt-options a:hover {

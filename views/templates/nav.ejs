@@ -1,26 +1,35 @@
 <nav>
-    <div class="nav-left">
-        <a href="/"><img src="/mediaResources/logo4.png" class="logo" alt=""></a>
-        <ul>
-            <li><a href="#">Highlights</a></li>
-            <li><a href="#">Recommendation</a></li>
-            <li><a href="#">Reviews</a></li>
-            <li><a href="#">Community</a></li>
-        </ul>
+  <div class="nav-left">
+    <a href="/"><img src="/mediaResources/logo4.png" class="logo" alt="" /></a>
+    <ul>
+      <div style="display: flex; align-items: center">
+        <li><a href="initialRecommend">Recommender</a></li>
+      </div>
+    </ul>
+  </div>
+  <div class="nav-right">
+    <form action="/user" method="get" onsubmit="easterEgg()">
+      <div class="search-box">
+        <img src="/mediaResources/searchglass.png" alt="" />
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Search"
+          style="padding: 0; margin-bottom: 0;"
+        />
+        <input
+          type="submit"
+          value="Search"
+          style="visibility: hidden; width: 0; padding: 0"
+        />
+      </div>
+    </form>
+    <div class="nav-user-icon">
+      <a href="/profile">
+        <img src="/mediaResources/user.png" alt="" />
+      </a>
     </div>
-    <div class="nav-right">
-        <form action="/user" method="get" onsubmit="easterEgg()">
-            <div class="search-box">
-                <img src="/mediaResources/searchglass.png" alt="">
-                <input type="text" id="username" name="username" placeholder="Search" style="padding:0">
-                <input type="submit" value="Search" style="visibility: hidden; width: 0; padding:0">
-            </div>
-        </form>
-        <div class="nav-user-icon">
-            <a href="/profile">
-                <img src="/mediaResources/user.png" alt="">
-            </a>
-        </div>
-    </div>
-    <script src="/scripts/pacman.js"></script>
+  </div>
+  <script src="/scripts/pacman.js"></script>
 </nav>
