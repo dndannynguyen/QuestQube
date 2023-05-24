@@ -1,45 +1,5 @@
-<%- include("templates/head", { stylesheetPath: ['/styles/finalRecommend.css','/styles/nav.css','/styles/foot.css'] })
-  %> <%- include("templates/nav") %>
-    <script src="/scripts/scrapeImages.js"></script>
-    <div class="content">
-      <div>
-        <p class="p1">Congrats on finishing your adventure!</p>
-      </div>
-      <div>
-        <p class="p2">
-          Based on your chosen adventure, we recommend the following games:
-        </p>
-      </div>
-      <div class="game-cards">
-        <% for (let i=0; i < 3; i++) { %>
-          <div class="game-info">
-            <div class="picture">
-              <img id="game-image-<%= i %>" src="" alt="" />
-            </div>
-            <div class="options">
-              <h1>
-                <%= gamesList[i] %>
-              </h1>
-              <form id="wishlist-form" action="/verifyWishlist" method="post">
-                <input type="hidden" name="game" value="<%= gamesList[i] %>">
-                <a onclick="submitForm()" href="#" style="--clr: #fceabb"><span>Add to Wishlist</span><i></i></a>
-              </form>
-            </div>
-          </div>
-          <script>
-            scrapeImages('<%= slugList[i] %>', 'game-image-<%= i %>'); 
-          </script>
-          <script>
-            function submitForm() {
-              document.getElementById("wishlist-form").submit();
-            }
-          </script>
-          <% } %>
-      </div>
-    </div>
-    <%- include("templates/foot") %>
-<%- include("templates/head", { stylesheetPath: ['/styles/finalRecommend.css','/styles/nav.css','/styles/foot.css'] }) %> <%-
-include("templates/nav") %>
+<%- include("templates/head", { stylesheetPath: ['/styles/finalRecommend.css','/styles/nav.css','/styles/foot.css'] }) %>
+<%- include("templates/nav") %>
 <script src="/scripts/scrapeImages.js"></script>
 <div class="content">
   <div>
@@ -56,7 +16,11 @@ include("templates/nav") %>
       </div>
       <div class="options">
         <h1><%= gamesList[i] %></h1>
-        <button onclick="recommendNewGame(<%= i %>);">Recommend a new game</button>
+        <form id="wishlist-form-<%= i %>" action="/verifyWishlist" method="post">
+          <input type="hidden" name="game" value="<%= gamesList[i] %>">
+          <a onclick="submitForm(<%= i %>);" href="#" class="wishlist-button"><span>Add to Wishlist</span><i></i></a>
+          <a onclick="recommendNewGame(<%= i %>);" class="recommend-button"><span>Recommend a new game</span></a>
+        </form>
       </div>
     </div>
     <script>
@@ -77,9 +41,12 @@ include("templates/nav") %>
           alert("Sorry, there are no more recommendations. Please restart the game for more recommendations.");
         }
       }
+      
+      function submitForm(index) {
+        document.getElementById("wishlist-form-" + index).submit();
+      }
     </script>
     <% } %>
   </div>
 </div>
-
 <%- include("templates/foot") %>
