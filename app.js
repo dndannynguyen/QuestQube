@@ -440,7 +440,8 @@ app.post(
         { email },
         { $set: { profilePic: `/${fileName}` } }
       );
-
+      const alertScript = `<script>alert('Profile Picture updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
       // Redirect to the previous page
       const previousPage = req.headers.referer || "/";
       res.redirect(previousPage);
@@ -449,6 +450,7 @@ app.post(
       // Handle the error accordingly
       // res.redirect('/profile'); // Redirect to the profile page or display an error message
     }
+
   }
 );
 
