@@ -9,19 +9,19 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="account-fn">Name</label>
-            <input class="form-control" type="text" name="name" value="<%= name %>" required="">
+            <input class="form-control" type="text" maxlength="24" name="name" value="<%= name %>" required="">
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="account-ln">Username</label>
-            <input class="form-control" type="text" name="username" value="<%= username %>" required="">
+            <input class="form-control" type="text" maxlength="24" name="username" value="<%= username %>" required="">
           </div>
         </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="account-email">E-mail Address</label>
-            <input class="form-control" type="email" name="email" value="<%= email %>" disabled="">
+            <input class="form-control" type="email" maxlength="24" name="email" value="<%= email %>" disabled="">
           </div>
         </div>
         <div class="col-md-6">
@@ -33,14 +33,14 @@
         <div class="col-md-6">
             <div class="form-group">
               <label for="account-pass">New Password</label>
-              <input class="form-control" type="password" name="newPassword" id="newPassword" placeholder="Enter New Password">
+              <input class="form-control" type="password" maxlength="129" name="newPassword" id="newPassword" placeholder="Enter New Password">
               <div id="passwordRequirements" class="password-requirements"></div>
             </div>
           </div>
         <div class="col-md-6">
           <div class="form-group">
             <label for="account-confirm-pass">Confirm Password</label>
-            <input class="form-control" type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm New Password">
+            <input class="form-control" type="password" maxlength="129" name="confirmPassword" id="confirmPassword" placeholder="Confirm New Password">
             <small id="passwordMatchError" style="color: red; display: none;">Passwords do not match.</small>
           </div>
         </div>
@@ -60,7 +60,7 @@
         <div class="col-md-6">
           <div class="form-group">
             <label for="secQuestAnswer">Security Question Answer</label>
-            <input type="text" class="form-control" name="security_answer" placeholder="Answer here">
+            <input type="text" class="form-control" maxlength="24" name="security_answer" placeholder="Answer here">
           </div>
         </div>
         <div class="col-md-6">

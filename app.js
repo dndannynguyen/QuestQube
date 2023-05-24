@@ -209,6 +209,8 @@ app.post("/signupSubmit", loggedIn, async (req, res) => {
       req.session.email = email;
       req.session.type = "user";
       req.session.cookie.maxAge = expireTime;
+      const alertScript = `<script>alert('Signed Up Sucessfully!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
       res.redirect("/profile");
     }
   } catch (error) {
@@ -284,6 +286,7 @@ app.post("/changePassword", async (req, res) => {
   if (bcrypt.compareSync(security_answer, user.security_answer)) {
     res.render("changePassword", { stylesheetPath: ["./styles/login.css"] });
   }
+  
 });
 
 app.post("/updatePassword", async (req, res) => {
@@ -300,6 +303,8 @@ app.post("/updatePassword", async (req, res) => {
       { email: email },
       { $set: { password: bcrypt.hashSync(password, 12) } }
     );
+    const alertScript = `<script>alert('Password updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     res.redirect("/profile");
   }
 });
@@ -484,6 +489,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
+      const alertScript = `<script>alert('Name updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     }
 
     if (updatedUsername !== user.username) {
@@ -497,6 +504,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
+      const alertScript = `<script>alert('Username updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     }
 
     if (updatedDob !== user.dob) {
@@ -510,6 +519,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
+      const alertScript = `<script>alert('Date of Birth updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     }
 
     if (
@@ -526,6 +537,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
+      const alertScript = `<script>alert('Password updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     }
 
     // Redirect or respond with a success message
@@ -805,7 +818,7 @@ app.get(
         let closestPeriodIndex = content.indexOf('.', middleIndex);
         let paragraph1 = content.substring(0, closestPeriodIndex + 1);
         let paragraph2 = content.substring(closestPeriodIndex + 1);
-        splitContent = [paragraph1, paragraph2]; 
+        splitContent = [paragraph1, paragraph2];
       } else {
         splitContent = [content]
       }
