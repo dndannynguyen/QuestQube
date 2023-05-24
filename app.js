@@ -668,7 +668,8 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
 
   let content = await gpt(message);
 
-  try {;
+  try {
+    ;
     splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
   } catch (err) {
     console.log('could not split content');
@@ -679,8 +680,8 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     splitContent.push("No more games to recommend");
   }
 
-  let game1,game2,game3,game4,game5,game6,game7,game8,game9,game10 = null;
-  let gamesList = [game1,game2,game3,game4,game5,game6,game7,game8,game9,game10];
+  let game1, game2, game3, game4, game5, game6, game7, game8, game9, game10 = null;
+  let gamesList = [game1, game2, game3, game4, game5, game6, game7, game8, game9, game10];
   let slugArray = [];
   let gameArray = [];
 
@@ -692,7 +693,7 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
       gameArray.push(game)
     }
   });
-  
+
   await Promise.all(promises);
 
   req.session.count = 0;
@@ -705,7 +706,7 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     { email: email },
     { $set: { answersArray: [] } }
   );
-  
+
   res.render("finalRecommend", {
     slugList: slugArray,
     gamesList: gameArray,
@@ -770,7 +771,8 @@ app.get(
     }
 
     if (req.session.count < 4) {
-      try {;
+      try {
+        ;
         splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
         let attempts = 0;
         while (splitContent.length < 3 && attempts < 5) {
@@ -780,20 +782,32 @@ app.get(
             console.log('could not get content');
             return res.redirect("/initialRecommend");
           }
-          try {;
+          try {
+            ;
             splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
           } catch (err) {
             console.log('could not split content');
             return res.redirect("/initialRecommend");
-          } 
+          }
         }
       } catch (err) {
         console.log('could not split content');
         return res.redirect("/initialRecommend");
-      } 
+      }
       console.log("splitContent:", splitContent)
     } else {
-      splitContent = [content]
+      if (content.includes('.')) {
+        let middleIndex = Math.floor(content.length / 2);
+
+        let closestPeriodIndex = content.indexOf('.', middleIndex);
+        
+        let paragraph1 = content.substring(0, closestPeriodIndex + 1);
+        let paragraph2 = content.substring(closestPeriodIndex + 1);
+        
+        splitContent = [paragraph1, paragraph2]; 
+      } else {
+        splitContent = [content]
+      }
     }
 
     await userCollection.updateOne(
@@ -804,7 +818,7 @@ app.get(
       sessionCount: req.session.count,
       splitContent: splitContent,
       count: req.session.count,
-      stylesheetPath: ["./styles/promptScreen.css", ],
+      stylesheetPath: ["./styles/promptScreen.css",],
     });
   }
 );
