@@ -243,7 +243,8 @@ app.post("/loginSubmit", loggedIn, async (req, res) => {
       email: req.body.email,
     });
     if (result.length == 0) {
-      res.render("loginSubmit.ejs");
+      const alertScript = `<script>alert('Email and password combination not found!'); window.location.href = "/login";</script>`;
+      return res.send(alertScript);
     } else if (bcrypt.compareSync(req.body.password, result[0].password)) {
       req.session.GLOBAL_AUTHENTICATION = true;
       req.session.name = result[0].name;
@@ -252,7 +253,8 @@ app.post("/loginSubmit", loggedIn, async (req, res) => {
       req.session.cookie.maxAge = expireTime;
       res.redirect("/profile");
     } else {
-      res.render("loginSubmit.ejs");
+      const alertScript = `<script>alert('Email and password combination not found!'); window.location.href = "/login";</script>`;
+      return res.send(alertScript);
     }
   } catch (error) {
     res.redirect("/login");
