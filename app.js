@@ -497,7 +497,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
-      const alertScript = `<script>alert('Name updated!'); window.location.href = "/profile";</script>`;
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
       return res.send(alertScript);
     }
 
@@ -512,7 +512,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
-      const alertScript = `<script>alert('Username updated!'); window.location.href = "/profile";</script>`;
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
       return res.send(alertScript);
     }
 
@@ -527,7 +527,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
-      const alertScript = `<script>alert('Date of Birth updated!'); window.location.href = "/profile";</script>`;
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
       return res.send(alertScript);
     }
 
@@ -542,7 +542,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
-      const alertScript = `<script>alert('Gaming Platform updated!'); window.location.href = "/profile";</script>`;
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
       return res.send(alertScript);
     }
 
@@ -557,7 +557,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
-      const alertScript = `<script>alert('Gaming Id updated!'); window.location.href = "/profile";</script>`;
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
       return res.send(alertScript);
     }
 
@@ -576,7 +576,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
-      const alertScript = `<script>alert('Password updated!'); window.location.href = "/profile";</script>`;
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
       return res.send(alertScript);
     }    
 
