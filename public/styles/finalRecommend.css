@@ -90,6 +90,7 @@ body {
     border-radius: 10px;
     transition: 0.5s;
     margin-bottom: 10px;
+    width: 100%;
 }
 
 .options a:hover {
@@ -184,6 +185,8 @@ body {
 
     .options a {
         font-size: 1.5em;
+        display: flex;
+        width: 100%;
     }
 
     .game-info img {

@@ -716,16 +716,16 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
 
   await Promise.all(promises);
 
-  req.session.count = 0;
-  req.session.genre = 0;
-  await userCollection.updateOne(
-    { email: email },
-    { $set: { promptsArray: [] } }
-  );
-  await userCollection.updateOne(
-    { email: email },
-    { $set: { answersArray: [] } }
-  );
+  // req.session.count = 0;
+  // req.session.genre = 0;
+  // await userCollection.updateOne(
+  //   { email: email },
+  //   { $set: { promptsArray: [] } }
+  // );
+  // await userCollection.updateOne(
+  //   { email: email },
+  //   { $set: { answersArray: [] } }
+  // );
 
   res.render("finalRecommend", {
     slugList: slugArray,

@@ -10,7 +10,7 @@
   </div>
   <div class="game-cards">
     <% for (let i = 0; i < 6; i++) { %>
-    <div class="game-info" id="game-card-<%= i %>" <% if(i >= 3) { %>style="display: none;"<% } %>>
+    <div class="game-info <%= (i >= 3) ? 'hidden-card' : '' %>" id="game-card-<%= i %>" <% if(i >= 3) { %>style="display: none;"<% } %>>
       <div class="picture">
         <img id="game-image-<%= i %>" src="" alt="" />
       </div>
@@ -18,28 +18,39 @@
         <h1><%= gamesList[i] %></h1>
         <form id="wishlist-form-<%= i %>" action="/verifyWishlist" method="post">
           <input type="hidden" name="game" value="<%= gamesList[i] %>">
-          <a onclick="submitForm(<%= i %>);" href="#" class="wishlist-button"><span>Add to Wishlist</span><i></i></a>
-          <a onclick="recommendNewGame(<%= i %>);" class="recommend-button"><span>Recommend a new game</span></a>
+          <a onclick="submitForm(<%= i %>);" href="#" class="wishlist-button text-wrap"><span>Add to Wishlist</span><i></i></a>
+          <a onclick="recommendNewGame(<%= i %>);" class="recommend-button text-wrap"><span>New Game</span></a>
         </form>
       </div>
     </div>
     <script>
-      if(<%= i %> < 6) {
+      if (<%= i %> < 6) {
         scrapeImages('<%= slugList[i] %>', 'game-image-<%= i %>'); 
       }
       
       function recommendNewGame(index) {
         var currentCard = document.getElementById('game-card-' + index);
-        currentCard.remove();
-        
-        var hiddenCards = document.querySelectorAll('.game-info[style="display: none;"]');
+        var hiddenCards = document.querySelectorAll('.hidden-card');
         if (hiddenCards.length > 0) {
           var randomIndex = Math.floor(Math.random() * hiddenCards.length);
           var newCard = hiddenCards[randomIndex];
-          newCard.style.display = 'block';
+          newCard.style.display = 'flex';
+          newCard.classList.remove('hidden-card');
+          currentCard.remove();
         } else {
           alert("Sorry, there are no more recommendations. Please restart the game for more recommendations.");
         }
+        
+        hiddenCards = document.querySelectorAll('.hidden-card');
+          if (hiddenCards.length === 0) {
+            alert("Sorry, there are no more recommendations. Please restart the game for more recommendations.");
+            var recommendButtons = document.querySelectorAll('.recommend-button');
+            // Disable all recommend buttons
+            recommendButtons.forEach(function(button) {
+              button.disabled = true;
+              button.removeAttribute('onclick');
+            });
+          }
       }
       
       function submitForm(index) {
