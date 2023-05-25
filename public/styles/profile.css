@@ -140,4 +140,8 @@ label{
              .list-group-item {
                     width: 100%;          
                 }
+        p {
+            font-size: 16px;
+            margin-left: 40px;
+        }
 }

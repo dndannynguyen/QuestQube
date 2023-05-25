@@ -346,6 +346,8 @@ app.get("/profile", userAuthenticator, async (req, res) => {
   const name = result[0].name;
   const dob = result[0].dob;
   const profilePic = result[0].profilePic;
+  const gamingPlatform = result[0].gamingPlatform;
+  const gamingId = result[0].gamingId;
 
   let profilePicUrl = null;
   if (profilePic) {
@@ -354,6 +356,8 @@ app.get("/profile", userAuthenticator, async (req, res) => {
 
   res.render("profile", {
     username,
+    gamingId,
+    gamingPlatform,
     name,
     email,
     dob,
@@ -470,6 +474,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
   const updatedDob = req.body.dob;
   const newPassword = req.body.newPassword;
   const confirmPassword = req.body.confirmPassword;
+  const gamingPlatform = req.body.gamingPlatform;
+  const gamingId = req.body.gamingId;
   console.log(updatedName);
 
   // Fetch the user document from the database
@@ -525,7 +531,38 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
       return res.send(alertScript);
     }
 
+    if (gamingPlatform !== user.gamingPlatform && gamingPlatform !== "") {
+      await userCollection.updateOne(
+        {
+          email: email,
+        },
+        {
+          $set: {
+            gamingPlatform: gamingPlatform,
+          },
+        }
+      );
+      const alertScript = `<script>alert('Gaming Platform updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
+    }
+
+    if (gamingId !== user.gamingId && gamingId !== "") {
+      await userCollection.updateOne(
+        {
+          email: email,
+        },
+        {
+          $set: {
+            gamingId: gamingId,
+          },
+        }
+      );
+      const alertScript = `<script>alert('Gaming Id updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
+    }
+
     if (
+      newPassword !== "" &&
       !bcrypt.compareSync(newPassword, user.password) &&
       newPassword === confirmPassword
     ) {
@@ -541,7 +578,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
       );
       const alertScript = `<script>alert('Password updated!'); window.location.href = "/profile";</script>`;
       return res.send(alertScript);
-    }
+    }    
 
     // Redirect or respond with a success message
     return res.redirect("/profile");
