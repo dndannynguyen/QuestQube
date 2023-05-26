@@ -13,123 +13,95 @@ Database: MongoDB, BackBlazeB2
 AI: OpenAI API
 Other APIs: IGDB API, BackBlaze API
 
-# File Contents
-|   .env
-|   .gitignore
-|   app.js
-|   databaseConnection.js
-|   gpt.js
-|   package-lock.json
-|   package.json
-|   Procfile
-|   prompts.js
-|   README.md
-|   server.js
-|   Tree.txt
-|   utils.js
-|   verifyGame.js
-|   
-+---models
-|       user.js
-|       
-|           
-+---public
-|   +---datasets
-|   |       games_list.csv
-|   |       
-|   +---mediaResources
-|   |   |   1.jpg
-|   |   |   beast.jpg
-|   |   |   cheer.jpg
-|   |   |   city.jpg
-|   |   |   favicon.ico
-|   |   |   ghost.png
-|   |   |   ghosts.gif
-|   |   |   guild.jpg
-|   |   |   initial.png
-|   |   |   loading.svg
-|   |   |   logo.png
-|   |   |   logo4.png
-|   |   |   pacman.gif
-|   |   |   pacman_music.mp3
-|   |   |   searchglass.png
-|   |   |   user.png
-|   |   |   video.mp4
-|   |   |   
-|   |   \---Avatars
-|   |           1.jpg
-|   |           10.jpg
-|   |           11.jpg
-|   |           12.jpg
-|   |           13.jpg
-|   |           14.jpg
-|   |           15.jpg
-|   |           16.jpg
-|   |           2.jpg
-|   |           3.jpg
-|   |           4.jpg
-|   |           5.jpg
-|   |           6.jpg
-|   |           7.jpg
-|   |           8.jpg
-|   |           9.jpg
-|   |           
-|   +---scripts
-|   |       gameSearchbar.js
-|   |       loader.js
-|   |       pacman.js
-|   |       profileSwapper.js
-|   |       scrapeImages.js
-|   |       
-|   \---styles
-|           404.css
-|           community.css
-|           favourites.css
-|           finalRecommend.css
-|           foot.css
-|           gameSearchbar.css
-|           index.css
-|           initialRecommend.css
-|           login.css
-|           loginSubmit.css
-|           nav.css
-|           profile.css
-|           promptScreen.css
-|           recommender.css
-|           signup.css
-|           signupSubmit.css
-|           wishlist.css
-|           
-+---uploads
-|       text.txt
-|       
-\---views
-    |   404.ejs
-    |   changePassword.ejs
-    |   community.ejs
-    |   favourites.ejs
-    |   finalRecommend.ejs
-    |   forgotPassword.ejs
-    |   index.ejs
-    |   initialRecommend.ejs
-    |   login.ejs
-    |   loginSubmit.ejs
-    |   profile.ejs
-    |   promptScreen.ejs
-    |   recommender.ejs
-    |   securityQuestion.ejs
-    |   signup.ejs
-    |   signupSubmit.ejs
-    |   updatePassword.ejs
-    |   user.ejs
-    |   wishlist.ejs
-    |   
-    \---templates
-            foot.ejs
-            gameSearchbar.ejs
-            head.ejs
-            nav.ejs
-            profile_picture.ejs
+- .env
+- .gitignore
+- app.js
+- databaseConnection.js
+- gpt.js
+- package-lock.json
+- package.json
+- Procfile
+- prompts.js
+- README.md
+- server.js
+- Tree.txt
+- utils.js
+- verifyGame.js
+- models/
+    - user.js
+- public/
+    - datasets/
+        - games_list.csv
+    - mediaResources/
+        - beast.jpg
+        - cheer.jpg
+        - city.jpg
+        - favicon.ico
+        - ghost.png
+        - ghosts.gif
+        - guild.jpg
+        - initial.png
+        - loading.svg
+        - logo.png
+        - logo4.png
+        - pacman.gif
+        - pacman_music.mp3
+        - searchglass.png
+        - user.png
+        - video.mp4
+    - scripts/
+        - gameSearchbar.js
+        - loader.js
+        - pacman.js
+        - profileSwapper.js
+        - scrapeImages.js
+    - styles/
+        - 404.css
+        - community.css
+        - favourites.css
+        - finalRecommend.css
+        - foot.css
+        - gameSearchbar.css
+        - index.css
+        - initialRecommend.css
+        - login.css
+        - loginSubmit.css
+        - nav.css
+        - profile.css
+        - promptScreen.css
+        - recommender.css
+        - signup.css
+        - signupSubmit.css
+        - wishlist.css
+- uploads/
+    - text.txt
+- views/
+    - 404.ejs
+    - changePassword.ejs
+    - community.ejs
+    - favourites.ejs
+    - finalRecommend.ejs
+    - forgotPassword.ejs
+    - index.ejs
+    - initialRecommend.ejs
+    - login.ejs
+    - loginSubmit.ejs
+    - profile.ejs
+    - promptScreen.ejs
+    - recommender.ejs
+    - securityQuestion.ejs
+    - signup.ejs
+    - signupSubmit.ejs
+    - updatePassword.ejs
+    - user.ejs
+    - wishlist.ejs
+    - templates/
+        - foot.ejs
+        - gameSearchbar.ejs
+        - head.ejs
+        - nav.ejs
+        - profile_picture.ejs
+
             
 # How to Install
 1. To work on our web app, the developer need to install an IDE such as vscode, MongoDB database, node modules and nodemon. 
