@@ -1,49 +1,67 @@
 <%- include("templates/head", { stylesheetPath:
-  ['/styles/favourites.css','/styles/nav.css','/styles/foot.css','/styles/profile.css','/styles/gameSearchbar.css'] })
-  %> <%- include("templates/nav") %>
-    <div class="favourites mt-5">
-      <div class="row">
-        <%- include("templates/profile_picture") %>
-          <!-- Favourites -->
-          <div class="col-lg-8 pb-5">
-            <script src="/scripts/gameSearchbar.js"></script>
-            <script src="/scripts/scrapeImages.js"></script>
-            <div id="favourites-container">
-              <h1 class="mb-4">Favourite Games</h1>
-              <div class="favourites">
-                <form autocomplete="off" action="/verifyFavourite" method="post">
-                  <h4>Add a new favourite</h4>
-                  <%- include('templates/gameSearchbar') %>
-                </form>
-                <% if (success==='true' ) { %>
-                  <div class="success-message">Successfully added to your favourites!</div>
-                  <% } else if (success==='false' ) { %>
-                    <div class="error-message">Sorry, that game is in another castle! Please try again.</div>
-                    <% } %>
-                      <br>
-                      <div class="row">
-                        <% for (var i=0; i < favourites.length; i++) { %>
-                          <div class="col-md-4" style="margin-top: 15px;">
-                            <div class="card mb-4">
-                              <img id="game-image-<%= i %>" src="" alt="" class="card-img-top">
-                              <div class="card-body">
-                                <form action="/removeFavourite" method="post">
-                                  <input type="hidden" name="game" value="<%= favourites[i] %>">
-                                  <button type="submit" class="btn btn-danger my-2"
-                                    style="width: 93%; margin-top: 5px;">Remove</button>
-                                </form>
-                              </div>
-                            </div>
-                          </div>
-                          <script>
-                            scrapeImages('<%= favourites[i] %>', 'game-image-<%= i %>');
-                          </script>
-                          <% } %>
-                      </div>
+['/styles/favourites.css','/styles/nav.css','/styles/foot.css','/styles/profile.css','/styles/gameSearchbar.css']
+}) %> <%- include("templates/nav") %>
+<div class="favourites mt-5">
+  <div class="row">
+    <%- include("templates/profile_picture") %>
+    <!-- Favourites -->
+    <div class="col-lg-8 pb-5">
+      <script src="/scripts/gameSearchbar.js"></script>
+      <script src="/scripts/scrapeImages.js"></script>
+      <div id="favourites-container">
+        <h1 class="mb-4">Favourite Games</h1>
+        <div class="favourites">
+          <form autocomplete="off" action="/verifyFavourite" method="post">
+            <h4>Add a new favourite</h4>
+            <%- include('templates/gameSearchbar') %>
+          </form>
+          <% if (success==='true' ) { %>
+          <div class="success-message">
+            Successfully added to your favourites!
+          </div>
+          <% } else if (success==='false' ) { %>
+          <div class="error-message">
+            Sorry, that game is in another castle! Please try again.
+          </div>
+          <% } %>
+          <br />
+          <div class="row">
+            <% for (var i=0; i < favourites.length; i++) { %>
+            <div class="col-md-4" style="margin-top: 15px">
+              <div class="card mb-4">
+                <img
+                  id="game-image-<%= i %>"
+                  src=""
+                  alt=""
+                  class="card-img-top"
+                />
+                <div class="card-body">
+                  <form action="/removeFavourite" method="post">
+                    <input
+                      type="hidden"
+                      name="game"
+                      value="<%= favourites[i] %>"
+                    />
+                    <button
+                      type="submit"
+                      class="btn btn-danger my-2"
+                      style="width: 93%; margin-top: 5px"
+                    >
+                      Remove
+                    </button>
+                  </form>
+                </div>
               </div>
             </div>
+            <script>
+              scrapeImages("<%= favourites[i] %>", "game-image-<%= i %>");
+            </script>
+            <% } %>
           </div>
+        </div>
       </div>
     </div>
+  </div>
+</div>
 
-    <%- include("templates/foot") %>
+<%- include("templates/foot") %>

@@ -1,6 +1,6 @@
 const setup = () => {
-  getGames()
-}
+  getGames();
+};
 
 const getGames = () => {
   $.ajax({
@@ -8,24 +8,31 @@ const getGames = () => {
     dataType: "text",
     success: function (data) {
       var csvData = $.csv.toArrays(data);
-      var gameTitles = []
-      csvData.forEach(game => {
-        gameTitles.push(game[1])
-      })
-      gameTitles.shift()
-      gameTitles = [...new Set(gameTitles)]
+      var gameTitles = [];
+      csvData.forEach((game) => {
+        gameTitles.push(game[1]);
+      });
+      gameTitles.shift();
+      gameTitles = [...new Set(gameTitles)];
       autocomplete(document.getElementById("game-search"), gameTitles);
-    }
+    },
   });
-}
+};
 
 function autocomplete(inp, arr) {
   var currentFocus;
   inp.addEventListener("input", function (e) {
-    var a, b, i, val = this.value;
+    var a,
+      b,
+      i,
+      val = this.value;
     closeAllLists();
-    if (val.length < 3) { return false; }
-    if (!val) { return false; }
+    if (val.length < 3) {
+      return false;
+    }
+    if (!val) {
+      return false;
+    }
     currentFocus = -1;
     a = document.createElement("DIV");
     a.setAttribute("id", this.id + "autocomplete-list");
@@ -34,11 +41,15 @@ function autocomplete(inp, arr) {
     for (i = 0; i < arr.length; i++) {
       if (arr[i].toUpperCase().includes(val.toUpperCase())) {
         if (a.childElementCount > 25) {
-          break
+          break;
         }
         b = document.createElement("DIV");
-        b.innerHTML = arr[i].replace(new RegExp(val, "i"), "<strong>$&</strong>");
-        b.innerHTML += "<input type='hidden' value='" + arr[i].replace("'", "") + "'>";
+        b.innerHTML = arr[i].replace(
+          new RegExp(val, "i"),
+          "<strong>$&</strong>"
+        );
+        b.innerHTML +=
+          "<input type='hidden' value='" + arr[i].replace("'", "") + "'>";
         b.addEventListener("click", function (e) {
           inp.value = this.getElementsByTagName("input")[0].value;
           closeAllLists();
@@ -67,7 +78,7 @@ function autocomplete(inp, arr) {
     if (!x) return false;
     removeActive(x);
     if (currentFocus >= x.length) currentFocus = 0;
-    if (currentFocus < 0) currentFocus = (x.length - 1);
+    if (currentFocus < 0) currentFocus = x.length - 1;
     x[currentFocus].classList.add("autocomplete-active");
   }
   function removeActive(x) {
@@ -88,4 +99,4 @@ function autocomplete(inp, arr) {
   });
 }
 
-$(document).ready(setup())
+$(document).ready(setup());
