@@ -1,10 +1,59 @@
 const determineKeywords = (genre) => {
   const keywords = {
-    0: ["Pistol", "Tactical Knife", "Grappling Hook", "Explosives", "Rope", "Night Vision Goggles", "First Aid Kit", "Multi-tool", "Smoke Grenades", "Portable Surveillance Equipment"],
-    1: ["Sword", "Bow and Arrows", "Staff", "Shield", "Potion", "Lockpick", "Magic Scroll", "Armor", "Map", "Quest Journal"],
-    2: ["Chessboard", "Strategy Guide", "Codebreaker", "Logic Puzzle", "Planning Notebook", "Map", "Calculator", "Mind Teaser", "Cipher Wheel", "Strategy Board Game"],
-    3: ["VR headset", "bouquet of roses", "Augmented reality glasses", "virtual pet dinosaur", "digital alarm clock"],
-    4: ["basketball", "soccer ball", "super car", "foot ball", "vintage sports car", "tennis racket", "golf club", "fishing rod", "baseball bat"]
+    0: [
+      "Pistol",
+      "Tactical Knife",
+      "Grappling Hook",
+      "Explosives",
+      "Rope",
+      "Night Vision Goggles",
+      "First Aid Kit",
+      "Multi-tool",
+      "Smoke Grenades",
+      "Portable Surveillance Equipment",
+    ],
+    1: [
+      "Sword",
+      "Bow and Arrows",
+      "Staff",
+      "Shield",
+      "Potion",
+      "Lockpick",
+      "Magic Scroll",
+      "Armor",
+      "Map",
+      "Quest Journal",
+    ],
+    2: [
+      "Chessboard",
+      "Strategy Guide",
+      "Codebreaker",
+      "Logic Puzzle",
+      "Planning Notebook",
+      "Map",
+      "Calculator",
+      "Mind Teaser",
+      "Cipher Wheel",
+      "Strategy Board Game",
+    ],
+    3: [
+      "VR headset",
+      "bouquet of roses",
+      "Augmented reality glasses",
+      "virtual pet dinosaur",
+      "digital alarm clock",
+    ],
+    4: [
+      "basketball",
+      "soccer ball",
+      "super car",
+      "foot ball",
+      "vintage sports car",
+      "tennis racket",
+      "golf club",
+      "fishing rod",
+      "baseball bat",
+    ],
   };
   let keywordsList = [];
   let usedKeywords = []; // Array to keep track of used keywords
@@ -25,10 +74,9 @@ const determineKeywords = (genre) => {
   return keywordsList;
 };
 
-
 system = {
-    role: "system",
-    content: `
+  role: "system",
+  content: `
     You are an interactive narrative story teller. You will generate a story prompt for the user followed by 5 choices that the user can choose from. You will be given a set of rules and context to follow for each section of the story. After you have generated 3 story prompts along with their choices, you will conclude the story.
 
     Rules:
@@ -39,7 +87,7 @@ system = {
     Each choice must be between 7 to 12 words and be a single sentence.
     Choices must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
     `,
-}
+};
 
 storyPrompt1 = {
   role: "system",
@@ -62,7 +110,7 @@ storyPrompt1 = {
     #4 Choice 4
     #5 Choice 5
     `,
-}
+};
 
 storyPrompt2 = {
   role: "system",
@@ -78,7 +126,7 @@ storyPrompt2 = {
   #4 Choice 4
   #5 Choice 5
   `,
-}
+};
 
 storyPrompt3 = {
   role: "system",
@@ -94,7 +142,7 @@ storyPrompt3 = {
   #4 Choice 4
   #5 Choice 5
   `,
-}
+};
 
 conclusionPrompt = {
   role: "system",
@@ -105,7 +153,7 @@ conclusionPrompt = {
   Desired format:
   Conclusion goes here.
   `,
-}
+};
 
 recommendPrompt = {
   role: "system",
@@ -125,8 +173,7 @@ recommendPrompt = {
   #9 Game 9
   #10 Game 10
   `,
-}
-
+};
 
 module.exports = {
   determineKeywords,
@@ -135,5 +182,5 @@ module.exports = {
   storyPrompt2,
   storyPrompt3,
   conclusionPrompt,
-  recommendPrompt
+  recommendPrompt,
 };

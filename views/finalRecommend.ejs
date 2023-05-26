@@ -1,33 +1,55 @@
-<%- include("templates/head", { stylesheetPath: ['/styles/finalRecommend.css','/styles/nav.css','/styles/foot.css'] }) %>
-<%- include("templates/nav") %>
+<%- include("templates/head", { stylesheetPath:
+['/styles/finalRecommend.css','/styles/nav.css','/styles/foot.css'] }) %> <%-
+include("templates/nav") %>
 <script src="/scripts/scrapeImages.js"></script>
 <div class="content">
   <div>
     <p class="p1">Congrats on finishing your adventure!</p>
   </div>
   <div>
-    <p class="p2">Based on your chosen adventure, we recommend the following games:</p>
+    <p class="p2">
+      Based on your chosen adventure, we recommend the following games:
+    </p>
   </div>
   <div class="game-cards">
     <% for (let i = 0; i < 6; i++) { %>
-    <div class="game-info <%= (i >= 3) ? 'hidden-card' : '' %>" id="game-card-<%= i %>" <% if(i >= 3) { %>style="display: none;"<% } %>>
+    <div
+      class="game-info <%= (i >= 3) ? 'hidden-card' : '' %>"
+      id="game-card-<%= i %>"
+      <%
+      if(i
+    >
+      = 3) { %>style="display: none;"<% } %>>
       <div class="picture">
         <img id="game-image-<%= i %>" src="" alt="" />
       </div>
       <div class="options">
         <h1><%= gamesList[i] %></h1>
-        <form id="wishlist-form-<%= i %>" action="/verifyWishlist" method="post">
-          <input type="hidden" name="game" value="<%= gamesList[i] %>">
-          <a onclick="submitForm(<%= i %>);" href="#" class="wishlist-button text-wrap"><span>Add to Wishlist</span><i></i></a>
-          <a onclick="recommendNewGame(<%= i %>);" class="recommend-button text-wrap"><span>New Game</span></a>
+        <form
+          id="wishlist-form-<%= i %>"
+          action="/verifyWishlist"
+          method="post"
+        >
+          <input type="hidden" name="game" value="<%= gamesList[i] %>" />
+          <a
+            onclick="submitForm(<%= i %>);"
+            href="#"
+            class="wishlist-button text-wrap"
+            ><span>Add to Wishlist</span><i></i
+          ></a>
+          <a
+            onclick="recommendNewGame(<%= i %>);"
+            class="recommend-button text-wrap"
+            ><span>New Game</span></a
+          >
         </form>
       </div>
     </div>
     <script>
       if (<%= i %> < 6) {
-        scrapeImages('<%= slugList[i] %>', 'game-image-<%= i %>'); 
+        scrapeImages('<%= slugList[i] %>', 'game-image-<%= i %>');
       }
-      
+
       function recommendNewGame(index) {
         var currentCard = document.getElementById('game-card-' + index);
         var hiddenCards = document.querySelectorAll('.hidden-card');
@@ -40,7 +62,7 @@
         } else {
           alert("Sorry, there are no more recommendations. Please restart the game for more recommendations.");
         }
-        
+
         hiddenCards = document.querySelectorAll('.hidden-card');
           if (hiddenCards.length === 0) {
             alert("Sorry, there are no more recommendations. Please restart the game for more recommendations.");
@@ -52,7 +74,7 @@
             });
           }
       }
-      
+
       function submitForm(index) {
         document.getElementById("wishlist-form-" + index).submit();
       }

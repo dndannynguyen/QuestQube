@@ -1,19 +1,19 @@
-<%- include("templates/head",{ stylesheetPath: ['/styles/index.css', '/styles/foot.css'] }) %>
+<%- include("templates/head",{ stylesheetPath: ['/styles/index.css',
+'/styles/foot.css'] }) %>
 <div class="hero">
-        <video autoplay loop muted playsinline class="back-video">
-            <source src="/mediaResources/video.mp4" type="video/mp4">
-        </video>
-        <nav>
-            <img src="mediaResources/logo.png" alt="logo" class="logo">
-            <a href="login">
-            <button type="button" class="login-btn">Login</button>
-            </a>
-        </nav>
-        <div class="content">
-            <h1>START YOUR QUEST</h1>
-            <a href="signup">Explore</a>
-
-        </div>
-    </div>
+  <video autoplay loop muted playsinline class="back-video">
+    <source src="/mediaResources/video.mp4" type="video/mp4" />
+  </video>
+  <nav>
+    <img src="mediaResources/logo.png" alt="logo" class="logo" />
+    <a href="login">
+      <button type="button" class="login-btn">Login</button>
+    </a>
+  </nav>
+  <div class="content">
+    <h1>START YOUR QUEST</h1>
+    <a href="signup">Explore</a>
+  </div>
+</div>
 
 <%- include("templates/foot") %>

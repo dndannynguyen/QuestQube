@@ -288,7 +288,6 @@ app.post("/changePassword", async (req, res) => {
   if (bcrypt.compareSync(security_answer, user.security_answer)) {
     res.render("changePassword", { stylesheetPath: ["./styles/login.css"] });
   }
-  
 });
 
 app.post("/updatePassword", async (req, res) => {
@@ -306,7 +305,7 @@ app.post("/updatePassword", async (req, res) => {
       { $set: { password: bcrypt.hashSync(password, 12) } }
     );
     const alertScript = `<script>alert('Password updated!'); window.location.href = "/profile";</script>`;
-      return res.send(alertScript);
+    return res.send(alertScript);
     res.redirect("/profile");
   }
 });
@@ -453,10 +452,7 @@ app.post(
       res.redirect(previousPage);
     } catch (error) {
       console.error("Error uploading image:", error);
-      // Handle the error accordingly
-      // res.redirect('/profile'); // Redirect to the profile page or display an error message
     }
-
   }
 );
 
@@ -580,7 +576,7 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
       );
       const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
       return res.send(alertScript);
-    }    
+    }
 
     // Redirect or respond with a success message
     return res.redirect("/profile");
@@ -687,7 +683,7 @@ app.post("/removeWishlist", userAuthenticator, async (req, res) => {
 //INITIAL RECOMMENDER SCREEN
 app.get("/initialRecommend", userAuthenticator, async (req, res) => {
   req.session.count = 0;
-  console.log("session cookies reset")
+  console.log("session cookies reset");
   req.session.genre = 0;
   const email = req.session.email;
   // clear the prompt and answer fields in user collection
@@ -695,12 +691,12 @@ app.get("/initialRecommend", userAuthenticator, async (req, res) => {
     { email: email },
     { $set: { promptsArray: [] } }
   );
-  console.log("prompts cleared")
+  console.log("prompts cleared");
   await userCollection.updateOne(
     { email: email },
     { $set: { answersArray: [] } }
   );
-  console.log("answers cleared")
+  console.log("answers cleared");
   res.render("initialRecommend", {
     stylesheetPath: ["./styles/initialRecommend.css"],
   });
@@ -715,7 +711,7 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   const user = await userCollection.findOne({ email: email });
   const promptsArray = user.promptsArray;
   const answersArray = user.answersArray;
-  let message = []
+  let message = [];
   message.push(prompts.system);
   for (let i = 0; i < promptsArray.length; i++) {
     message.push({ role: "assistant", content: promptsArray[i] });
@@ -728,10 +724,9 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
   let content = await gpt(message);
 
   try {
-    ;
     splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
   } catch (err) {
-    console.log('could not split content');
+    console.log("could not split content");
     return res.redirect("/initialRecommend");
   }
 
@@ -739,8 +734,28 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     splitContent.push("No more games to recommend");
   }
 
-  let game1, game2, game3, game4, game5, game6, game7, game8, game9, game10 = null;
-  let gamesList = [game1, game2, game3, game4, game5, game6, game7, game8, game9, game10];
+  let game1,
+    game2,
+    game3,
+    game4,
+    game5,
+    game6,
+    game7,
+    game8,
+    game9,
+    game10 = null;
+  let gamesList = [
+    game1,
+    game2,
+    game3,
+    game4,
+    game5,
+    game6,
+    game7,
+    game8,
+    game9,
+    game10,
+  ];
   let slugArray = [];
   let gameArray = [];
 
@@ -749,22 +764,11 @@ app.get("/finalRecommend", userAuthenticator, async (req, res) => {
     let result = await verifyGame(game);
     if (result) {
       slugArray.push(result);
-      gameArray.push(game)
+      gameArray.push(game);
     }
   });
 
   await Promise.all(promises);
-
-  // req.session.count = 0;
-  // req.session.genre = 0;
-  // await userCollection.updateOne(
-  //   { email: email },
-  //   { $set: { promptsArray: [] } }
-  // );
-  // await userCollection.updateOne(
-  //   { email: email },
-  //   { $set: { answersArray: [] } }
-  // );
 
   res.render("finalRecommend", {
     slugList: slugArray,
@@ -782,34 +786,34 @@ app.get(
     const email = req.session.email;
     const user = await userCollection.findOne({ email: email });
     const answersArray = user.answersArray;
-    console.log("answersArray:", answersArray)
+    console.log("answersArray:", answersArray);
     const promptsArray = user.promptsArray;
-    console.log("promptsArray:", promptsArray)
+    console.log("promptsArray:", promptsArray);
     req.session.count = req.session.count + 1;
-    console.log("session counts:", req.session.count)
+    console.log("session counts:", req.session.count);
     let message = [];
-    console.log("initial message:", message)
+    console.log("initial message:", message);
     if (req.session.count == 1) {
-      message.push(prompts.system)
-      message.push(prompts.storyPrompt1)
+      message.push(prompts.system);
+      message.push(prompts.storyPrompt1);
     } else if (req.session.count == 2) {
-      const keywordsList = prompts.determineKeywords(req.session.genre)
-      message.push(prompts.system)
+      const keywordsList = prompts.determineKeywords(req.session.genre);
+      message.push(prompts.system);
       for (let i = 0; i < promptsArray.length; i++) {
         message.push({ role: "assistant", content: promptsArray[i] });
         message.push({ role: "user", content: answersArray[i] });
       }
-      prompts.storyPrompt2.content += `Use one of these keywords for each choice: ${keywordsList[0]}, ${keywordsList[1]}, ${keywordsList[2]}, ${keywordsList[3]}, ${keywordsList[4]}`
+      prompts.storyPrompt2.content += `Use one of these keywords for each choice: ${keywordsList[0]}, ${keywordsList[1]}, ${keywordsList[2]}, ${keywordsList[3]}, ${keywordsList[4]}`;
       message.push(prompts.storyPrompt2);
     } else if (req.session.count == 3) {
-      message.push(prompts.system)
+      message.push(prompts.system);
       for (let i = 0; i < promptsArray.length; i++) {
         message.push({ role: "assistant", content: promptsArray[i] });
         message.push({ role: "user", content: answersArray[i] });
       }
       message.push(prompts.storyPrompt3);
     } else if (req.session.count == 4) {
-      message.push(prompts.system)
+      message.push(prompts.system);
       for (let i = 0; i < promptsArray.length; i++) {
         message.push({ role: "assistant", content: promptsArray[i] });
         message.push({ role: "user", content: answersArray[i] });
@@ -821,47 +825,59 @@ app.get(
 
     let content;
     let splitContent;
-    console.log("message:", message)
+    console.log("message:", message);
     try {
       content = await gpt(message);
     } catch (err) {
-      console.log('could not get content');
+      console.log("could not get content");
       // Display alert and redirect
-      return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
+      return res.send(
+        '<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>'
+      );
     }
 
     if (req.session.count < 4) {
       try {
-        splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+        splitContent = content
+          .split(/#\d+\s+/)
+          .filter((option) => option !== "");
         let attempts = 0;
         while (splitContent.length < 3 && attempts < 5) {
           try {
             content = await gpt(message);
           } catch (err) {
-            console.log('could not get content');
-            return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
+            console.log("could not get content");
+            return res.send(
+              '<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>'
+            );
           }
           try {
-            splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+            splitContent = content
+              .split(/#\d+\s+/)
+              .filter((option) => option !== "");
           } catch (err) {
-            console.log('could not split content');
-            return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
+            console.log("could not split content");
+            return res.send(
+              '<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>'
+            );
           }
         }
       } catch (err) {
-        console.log('could not split content');
-        return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
+        console.log("could not split content");
+        return res.send(
+          '<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>'
+        );
       }
-      console.log("splitContent:", splitContent)
+      console.log("splitContent:", splitContent);
     } else {
-      if (content.includes('.')) {
+      if (content.includes(".")) {
         let middleIndex = Math.floor(content.length / 2);
-        let closestPeriodIndex = content.indexOf('.', middleIndex);
+        let closestPeriodIndex = content.indexOf(".", middleIndex);
         let paragraph1 = content.substring(0, closestPeriodIndex + 1);
         let paragraph2 = content.substring(closestPeriodIndex + 1);
         splitContent = [paragraph1, paragraph2];
       } else {
-        splitContent = [content]
+        splitContent = [content];
       }
     }
 
@@ -873,11 +889,10 @@ app.get(
       sessionCount: req.session.count,
       splitContent: splitContent,
       count: req.session.count,
-      stylesheetPath: ["./styles/promptScreen.css",],
+      stylesheetPath: ["./styles/promptScreen.css"],
     });
   }
 );
-
 
 app.get("/optionProcess", userAuthenticator, async (req, res) => {
   const email = req.session.email;

@@ -1,49 +1,61 @@
 <div class="col-lg-4 pb-5">
-    <!-- Account Sidebar-->
-    <div class="card mb-4 mb-xl-0">
-        <div class="card-header">Profile Picture</div>
-        <div class="card-body text-center">
-            <!-- Profile picture image-->
-            <% if (profilePic == null) { %>
-            <img class="img-account-profile rounded-circle mb-2"
-                src="https://t4.ftcdn.net/jpg/05/09/59/75/360_F_509597532_RKUuYsERhODmkxkZd82pSHnFtDAtgbzJ.jpg"
-                alt="">
-            <% } else { %>
-            <img class="img-account-profile rounded-circle mb-2" src="<%= profilePic %>" alt="">
-            <% } %>
-            <!-- Profile picture upload form-->
-            <form action="/saveImage" method="POST" enctype="multipart/form-data">
-                <input type="file" name="profilePic" id="profilePic" accept="image/*">
-                <button type="submit" class="btn btn-dark">Upload Profile Picture</button>
-            </form>
-        </div>
-        <div class="wizard">
-            <!-- Wizard for different pages -->
-            <nav class="list-group list-group-flush mb-0">
-                <a class="list-group-item" href="/profile">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="d-inline-block font-weight-medium text-uppercase">Profile Settings
-                            </div>
-                        </div>
-                    </div>
-                </a>
-                <a class="list-group-item" href="/wishlist">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="d-inline-block font-weight-medium text-uppercase">My Wishlist</div>
-                        </div>
-                    </div>
-                </a>
-                <a class="list-group-item" href="/favourites">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <div class="d-inline-block font-weight-medium text-uppercase">Favorite Games
-                            </div>
-                        </div>
-                    </div>
-                </a>
-            </nav>
-        </div>
+  <!-- Account Sidebar-->
+  <div class="card mb-4 mb-xl-0">
+    <div class="card-header">Profile Picture</div>
+    <div class="card-body text-center">
+      <!-- Profile picture image-->
+      <% if (profilePic == null) { %>
+      <img
+        class="img-account-profile rounded-circle mb-2"
+        src="https://t4.ftcdn.net/jpg/05/09/59/75/360_F_509597532_RKUuYsERhODmkxkZd82pSHnFtDAtgbzJ.jpg"
+        alt=""
+      />
+      <% } else { %>
+      <img
+        class="img-account-profile rounded-circle mb-2"
+        src="<%= profilePic %>"
+        alt=""
+      />
+      <% } %>
+      <!-- Profile picture upload form-->
+      <form action="/saveImage" method="POST" enctype="multipart/form-data">
+        <input type="file" name="profilePic" id="profilePic" accept="image/*" />
+        <button type="submit" class="btn btn-dark">
+          Upload Profile Picture
+        </button>
+      </form>
     </div>
+    <div class="wizard">
+      <!-- Wizard for different pages -->
+      <nav class="list-group list-group-flush mb-0">
+        <a class="list-group-item" href="/profile">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="d-inline-block font-weight-medium text-uppercase">
+                Profile Settings
+              </div>
+            </div>
+          </div>
+        </a>
+        <a class="list-group-item" href="/wishlist">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="d-inline-block font-weight-medium text-uppercase">
+                My Wishlist
+              </div>
+            </div>
+          </div>
+        </a>
+        <a class="list-group-item" href="/favourites">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="d-inline-block font-weight-medium text-uppercase">
+                Favorite Games
+              </div>
+            </div>
+          </div>
+        </a>
+      </nav>
+    </div>
+  </div>
 </div>
