@@ -93,13 +93,46 @@ const recommenderAuthenticator = (req, res, next) => {
   next();
 };
 
+// ALREADY LOGGED IN MIDDLEWARE
+const loggedIn = (req, res, next) => {
+  if (req.session.GLOBAL_AUTHENTICATION) {
+    return res.redirect("/profile");
+  }
+  next();
+};
+
+// Get Profile Picture
+const getProfilePic = async (email) => {
+  try {
+    // Authorize with Backblaze B2
+    await b2.authorize();
+
+    // Get the bucket information
+    let response = await b2.getBucket({ bucketName: backblaze_name });
+
+    const profilePicFileName = `${email}/Profile_Picture.jpg`;
+    const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}?${Date.now()}`;
+    return profilePicUrl;
+  } catch (error) {
+    console.error("Error connecting to Backblaze:", error);
+    profilePicUrl = null;
+    return profilePicUrl;
+  }
+};
+
+// INDEX PAGE
+app.get("/", (req, res) => {
+  const stylesheets = ["/styles/index.css", "/styles/foot.css"];
+  res.render("index", { stylesheets });
+});
+
 // SIGN UP PAGE
-app.get("/signup", (req, res) => {
+app.get("/signup", loggedIn, (req, res) => {
   res.render("signup", { stylesheetPath: ["./styles/login.css"] });
 });
 
 // SIGN UP SUBMIT PAGE
-app.post("/signupSubmit", async (req, res) => {
+app.post("/signupSubmit", loggedIn, async (req, res) => {
   const schema = joi.object({
     username: joi.string().required(),
     name: joi.string().required(),
@@ -176,6 +209,8 @@ app.post("/signupSubmit", async (req, res) => {
       req.session.email = email;
       req.session.type = "user";
       req.session.cookie.maxAge = expireTime;
+      const alertScript = `<script>alert('Signed Up Sucessfully!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
       res.redirect("/profile");
     }
   } catch (error) {
@@ -189,17 +224,12 @@ app.post("/signupSubmit", async (req, res) => {
 });
 
 // LOGIN PAGE
-app.get("/login", (req, res) => {
+app.get("/login", loggedIn, (req, res) => {
   res.render("login", { stylesheetPath: ["/styles/login.css"] });
 });
 
-app.get("/", (req, res) => {
-  const stylesheets = ["/styles/index.css", "/styles/foot.css"];
-  res.render("index", { stylesheets });
-});
-
 // LOGIN SUBMIT PAGE
-app.post("/loginSubmit", async (req, res) => {
+app.post("/loginSubmit", loggedIn, async (req, res) => {
   const schema = joi.object({
     email: joi.string().email().required(),
     password: joi.string().required(),
@@ -213,7 +243,8 @@ app.post("/loginSubmit", async (req, res) => {
       email: req.body.email,
     });
     if (result.length == 0) {
-      res.render("loginSubmit.ejs");
+      const alertScript = `<script>alert('Email and password combination not found!'); window.location.href = "/login";</script>`;
+      return res.send(alertScript);
     } else if (bcrypt.compareSync(req.body.password, result[0].password)) {
       req.session.GLOBAL_AUTHENTICATION = true;
       req.session.name = result[0].name;
@@ -222,18 +253,19 @@ app.post("/loginSubmit", async (req, res) => {
       req.session.cookie.maxAge = expireTime;
       res.redirect("/profile");
     } else {
-      res.render("loginSubmit.ejs");
+      const alertScript = `<script>alert('Email and password combination not found!'); window.location.href = "/login";</script>`;
+      return res.send(alertScript);
     }
   } catch (error) {
     res.redirect("/login");
   }
 });
 
-app.get("/forgotPassword", async (req, res) => {
+app.get("/forgotPassword", loggedIn, async (req, res) => {
   res.render("forgotPassword", { stylesheetPath: ["./styles/login.css"] });
 });
 
-app.post("/securityQuestion", async (req, res) => {
+app.post("/securityQuestion", loggedIn, async (req, res) => {
   const email = req.body.email;
   req.session.email = email;
   const user = await userCollection.findOne({ email: email });
@@ -256,6 +288,7 @@ app.post("/changePassword", async (req, res) => {
   if (bcrypt.compareSync(security_answer, user.security_answer)) {
     res.render("changePassword", { stylesheetPath: ["./styles/login.css"] });
   }
+  
 });
 
 app.post("/updatePassword", async (req, res) => {
@@ -272,6 +305,8 @@ app.post("/updatePassword", async (req, res) => {
       { email: email },
       { $set: { password: bcrypt.hashSync(password, 12) } }
     );
+    const alertScript = `<script>alert('Password updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     res.redirect("/profile");
   }
 });
@@ -284,9 +319,19 @@ app.get("/user/", userAuthenticator, async (req, res) => {
     const profilePic = result[0].profilePic;
     const favourites = result[0].favourites;
     const wishlist = result[0].wishlist;
+    const email = result[0].email;
+    const dob = result[0].dob;
+    const name = result[0].name;
+    let profilePicUrl = null;
+    if (profilePic) {
+      profilePicUrl = await getProfilePic(email);
+    }
     res.render("user", {
+      email: email,
+      dob: dob,
+      name: name,
       username: username,
-      profilePic: profilePic,
+      profilePic: profilePicUrl,
       favourites: favourites,
       wishlist: wishlist,
       stylesheetPath: "./styles/profile.css",
@@ -303,54 +348,24 @@ app.get("/profile", userAuthenticator, async (req, res) => {
   const name = result[0].name;
   const dob = result[0].dob;
   const profilePic = result[0].profilePic;
+  const gamingPlatform = result[0].gamingPlatform;
+  const gamingId = result[0].gamingId;
 
+  let profilePicUrl = null;
   if (profilePic) {
-    // Connect to Backblaze B2 storage
-    const b2 = new B2({
-      applicationKeyId: backblaze_account,
-      applicationKey: backblaze_API,
-    });
-
-    try {
-      // Authorize with Backblaze B2
-      await b2.authorize();
-
-      // Get the bucket information
-      let response = await b2.getBucket({ bucketName: backblaze_name });
-      const bucketInfo = response.data;
-
-      const profilePicFileName = `${email}/Profile_Picture.jpg`;
-      const profilePicUrl = `https://s3.us-east-005.backblazeb2.com/comp2537/${profilePicFileName}?${Date.now()}`;
-
-      res.render("profile", {
-        username,
-        name,
-        email,
-        dob,
-        profilePic: profilePicUrl,
-        stylesheetPath: "./styles/profile.css",
-      });
-    } catch (error) {
-      console.error("Error connecting to Backblaze:", error);
-      res.render("profile", {
-        username,
-        name,
-        email,
-        dob,
-        profilePic,
-        stylesheetPath: "./styles/profile.css",
-      });
-    }
-  } else {
-    res.render("profile", {
-      username,
-      name,
-      email,
-      dob,
-      profilePic,
-      stylesheetPath: "./styles/profile.css",
-    });
+    profilePicUrl = await getProfilePic(email);
   }
+
+  res.render("profile", {
+    username,
+    gamingId,
+    gamingPlatform,
+    name,
+    email,
+    dob,
+    profilePic: profilePicUrl,
+    stylesheetPath: "./styles/profile.css",
+  });
 });
 
 app.post(
@@ -408,40 +423,40 @@ app.post(
 
       // Delete the uploaded file from the local filesystem
       fs.unlinkSync(req.file.path);
-      console.log("Photo deleted locally")
 
       // Retrieve the current profile picture file path from the user document
       const user = await userModel.findOne({ email });
       const currentProfilePic = user.profilePic;
-      console.log("Photo retrieved from database")
 
       // Check if the current profile picture file path exists and is different from the new file path
-      // if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
-      //   // Extract the file name from the current profile picture file path
-      //   const currentFileName = currentProfilePic.substring(1);
+      if (currentProfilePic && currentProfilePic !== `/${fileName}`) {
+        // Extract the file name from the current profile picture file path
+        const currentFileName = currentProfilePic.substring(1);
 
-      //   // Delete the old profile picture file from Backblaze B2
-      //   // await b2.deleteFileVersion({
-      //   //   bucketId: backblaze_bucket,
-      //   //   fileName: currentFileName,
-      //   // });
-      //   // console.log("Old profile picture file deleted:", currentFileName);
-      // }
+        // Delete the old profile picture file from Backblaze B2
+        await b2.deleteFileVersion({
+          bucketId: backblaze_bucket,
+          fileName: currentFileName,
+        });
+        console.log("Old profile picture file deleted:", currentFileName);
+      }
 
       // Update the user's profilePic field in the database with the new file path
       await userCollection.updateOne(
         { email },
         { $set: { profilePic: `/${fileName}` } }
       );
-      console.log("Photo path updated in database") 
-
-      // Redirect to the profile page or display a success message
-      res.redirect("/profile");
+      const alertScript = `<script>alert('Profile Picture updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
+      // Redirect to the previous page
+      const previousPage = req.headers.referer || "/";
+      res.redirect(previousPage);
     } catch (error) {
       console.error("Error uploading image:", error);
       // Handle the error accordingly
       // res.redirect('/profile'); // Redirect to the profile page or display an error message
     }
+
   }
 );
 
@@ -461,6 +476,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
   const updatedDob = req.body.dob;
   const newPassword = req.body.newPassword;
   const confirmPassword = req.body.confirmPassword;
+  const gamingPlatform = req.body.gamingPlatform;
+  const gamingId = req.body.gamingId;
   console.log(updatedName);
 
   // Fetch the user document from the database
@@ -482,6 +499,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     }
 
     if (updatedUsername !== user.username) {
@@ -495,6 +514,8 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     }
 
     if (updatedDob !== user.dob) {
@@ -508,9 +529,42 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
+    }
+
+    if (gamingPlatform !== user.gamingPlatform && gamingPlatform !== "") {
+      await userCollection.updateOne(
+        {
+          email: email,
+        },
+        {
+          $set: {
+            gamingPlatform: gamingPlatform,
+          },
+        }
+      );
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
+    }
+
+    if (gamingId !== user.gamingId && gamingId !== "") {
+      await userCollection.updateOne(
+        {
+          email: email,
+        },
+        {
+          $set: {
+            gamingId: gamingId,
+          },
+        }
+      );
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
     }
 
     if (
+      newPassword !== "" &&
       !bcrypt.compareSync(newPassword, user.password) &&
       newPassword === confirmPassword
     ) {
@@ -524,7 +578,9 @@ app.post("/updateInfo", userAuthenticator, async (req, res) => {
           },
         }
       );
-    }
+      const alertScript = `<script>alert('Profile updated!'); window.location.href = "/profile";</script>`;
+      return res.send(alertScript);
+    }    
 
     // Redirect or respond with a success message
     return res.redirect("/profile");
@@ -540,10 +596,16 @@ app.get("/favourites", userAuthenticator, async (req, res) => {
   const user = await userModel.findOne({ email: email });
   const profilePic = user.profilePic;
   const success = req.query.success;
+
+  let profilePicUrl = null;
+  if (profilePic) {
+    profilePicUrl = await getProfilePic(email);
+  }
+
   res.render("favourites", {
     stylesheetPath: ["/styles/favourites.css", "/styles/profile.css"],
     favourites: user.favourites,
-    profilePic: profilePic,
+    profilePic: profilePicUrl,
     success: success,
   });
 });
@@ -581,10 +643,16 @@ app.get("/wishlist", userAuthenticator, async (req, res) => {
   const user = await userModel.findOne({ email: email });
   const profilePic = user.profilePic;
   const success = req.query.success;
+
+  let profilePicUrl = null;
+  if (profilePic) {
+    profilePicUrl = await getProfilePic(email);
+  }
+
   res.render("wishlist", {
     stylesheetPath: ["/styles/wishlist.css", "/styles/profile.css"],
     wishlist: user.wishlist,
-    profilePic: profilePic,
+    profilePic: profilePicUrl,
     success: success,
   });
 });
@@ -619,16 +687,20 @@ app.post("/removeWishlist", userAuthenticator, async (req, res) => {
 //INITIAL RECOMMENDER SCREEN
 app.get("/initialRecommend", userAuthenticator, async (req, res) => {
   req.session.count = 0;
+  console.log("session cookies reset")
+  req.session.genre = 0;
   const email = req.session.email;
   // clear the prompt and answer fields in user collection
   await userCollection.updateOne(
     { email: email },
     { $set: { promptsArray: [] } }
   );
+  console.log("prompts cleared")
   await userCollection.updateOne(
     { email: email },
     { $set: { answersArray: [] } }
   );
+  console.log("answers cleared")
   res.render("initialRecommend", {
     stylesheetPath: ["./styles/initialRecommend.css"],
   });
@@ -636,120 +708,64 @@ app.get("/initialRecommend", userAuthenticator, async (req, res) => {
 
 //FINAL RECOMMENDER SCREEN
 app.get("/finalRecommend", userAuthenticator, async (req, res) => {
-  let message = prompts.systemMessage3;
-  console.log("message:", message);
+  if (req.session.count < 3) {
+    return res.redirect("/initialRecommend");
+  }
   const email = req.session.email;
-  const user = await userModel.findOne({ email: email });
+  const user = await userCollection.findOne({ email: email });
   const promptsArray = user.promptsArray;
   const answersArray = user.answersArray;
+  let message = []
+  message.push(prompts.system);
   for (let i = 0; i < promptsArray.length; i++) {
     message.push({ role: "assistant", content: promptsArray[i] });
-    message.push({ role: "user", content: answersArray[i] });
+    if (i < promptsArray.length - 1) {
+      message.push({ role: "user", content: answersArray[i] });
+    }
   }
-  console.log("answersArray:", answersArray);
+  message.push(prompts.recommendPrompt);
+
   let content = await gpt(message);
-  if (!content.startsWith("#")) {
-    const hashtagIndex = content.indexOf("#");
-    if (hashtagIndex !== -1) {
-      content = content.substring(hashtagIndex);
-    }
+
+  try {
+    ;
+    splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+  } catch (err) {
+    console.log('could not split content');
+    return res.redirect("/initialRecommend");
   }
-  let attempts = 0;
-  options = content.split(/#\d+\s+/).filter((option) => option !== "");
-  console.log(options.length)
-  console.log(attempts)
-  while (options.length < 9 && attempts < 5) {
-    let content = await gpt(message);
-    options = content.split(/#\d+\s+/).filter((option) => option !== "");
-    attempts++;
-    console.log("options:", options)
-    console.log("final attempts:", attempts)
+
+  if (splitContent.length < 10) {
+    splitContent.push("No more games to recommend");
   }
-  if (attempts >= 5) {
-    options = [
-      "The Witcher 3: Wild Hunt",
-      "Little big planet 2",
-      "Minecraft",
-      "The Last of Us",
-      "Old School RuneScape",
-      "The Legend of Zelda: Breath of the Wild",
-      "The Elder Scrolls V: Skyrim",
-      "Fortnite",
-      "Super Mario Odyssey",
-      "Rayman 2: The Great Escape"
-    ]
-  }
-  options = options.map(function (option) {
-    return option.replace(/\n/g, "");
-  });
-  if (options.length < 9) {
-    while (options.length < 9) {
-      options.push("No more recommendations available");
-    }
-    console.log('pushed')
-  }
-  console.log("options:", options);
-  let game1,
-    game2,
-    game3,
-    game4,
-    game5,
-    game6,
-    game7,
-    game8,
-    game9,
-    game10 = null;
-  let gamesList = [
-    game1,
-    game2,
-    game3,
-    game4,
-    game5,
-    game6,
-    game7,
-    game8,
-    game9,
-    game10,
-  ];
+
+  let game1, game2, game3, game4, game5, game6, game7, game8, game9, game10 = null;
+  let gamesList = [game1, game2, game3, game4, game5, game6, game7, game8, game9, game10];
   let slugArray = [];
   let gameArray = [];
 
-  // Use `map` to create an array of promises
   let promises = gamesList.map(async (game) => {
-    game = options.pop();
-    try {
+    game = splitContent.pop();
     let result = await verifyGame(game);
-    console.log(result);
-    if (result) {
-      slugArray.push(result);
-      gameArray.push(game)
-    }} catch (error) {
-    options = [
-      "The Witcher 3: Wild Hunt",
-      "Little big planet 2",
-      "Minecraft",
-      "The Last of Us",
-      "Old School RuneScape",
-      "The Legend of Zelda: Breath of the Wild",
-      "The Elder Scrolls V: Skyrim",
-      "Fortnite",
-      "Super Mario Odyssey",
-      "Rayman 2: The Great Escape"
-    ]
-    game = options.pop();
-    let result = await verifyGame(game);
-    console.log(result);
     if (result) {
       slugArray.push(result);
       gameArray.push(game)
     }
-  }
   });
-  
-  // Wait for all promises to resolve using `Promise.all`
+
   await Promise.all(promises);
-  
-  console.log("finalArray:", slugArray);
+
+  // req.session.count = 0;
+  // req.session.genre = 0;
+  // await userCollection.updateOne(
+  //   { email: email },
+  //   { $set: { promptsArray: [] } }
+  // );
+  // await userCollection.updateOne(
+  //   { email: email },
+  //   { $set: { answersArray: [] } }
+  // );
+
   res.render("finalRecommend", {
     slugList: slugArray,
     gamesList: gameArray,
@@ -764,63 +780,109 @@ app.get(
   recommenderAuthenticator,
   async (req, res) => {
     const email = req.session.email;
-    const user = await userModel.findOne({ email: email });
+    const user = await userCollection.findOne({ email: email });
     const answersArray = user.answersArray;
+    console.log("answersArray:", answersArray)
     const promptsArray = user.promptsArray;
+    console.log("promptsArray:", promptsArray)
     req.session.count = req.session.count + 1;
-    console.log("session cookies equals", req.session.count);
-    let message = null;
+    console.log("session counts:", req.session.count)
+    let message = [];
+    console.log("initial message:", message)
     if (req.session.count == 1) {
-      message = prompts.systemMessage1;
+      message.push(prompts.system)
+      message.push(prompts.storyPrompt1)
     } else if (req.session.count == 2) {
-      message = prompts.systemMessage2;
-      const promptFormatted = { role: "assistant", content: promptsArray[0] };
-      const answerFormatted = { role: "user", content: answersArray[0] };
-      message.push(promptFormatted);
-      message.push(answerFormatted);
+      const keywordsList = prompts.determineKeywords(req.session.genre)
+      message.push(prompts.system)
+      for (let i = 0; i < promptsArray.length; i++) {
+        message.push({ role: "assistant", content: promptsArray[i] });
+        message.push({ role: "user", content: answersArray[i] });
+      }
+      prompts.storyPrompt2.content += `Use one of these keywords for each choice: ${keywordsList[0]}, ${keywordsList[1]}, ${keywordsList[2]}, ${keywordsList[3]}, ${keywordsList[4]}`
+      message.push(prompts.storyPrompt2);
     } else if (req.session.count == 3) {
-      // message = prompts.systemMessage3
-      // const answerFormatted1 = { role: "user", content: answersArray[0] }
-      // const answerFormatted2 = { role: "user", content: answersArray[1] }
-      // message.push(answerFormatted1)
-      // message.push(answerFormatted2)
-      // console.log("checkpoint 3", message)
-      return res.redirect("/finalRecommend");
+      message.push(prompts.system)
+      for (let i = 0; i < promptsArray.length; i++) {
+        message.push({ role: "assistant", content: promptsArray[i] });
+        message.push({ role: "user", content: answersArray[i] });
+      }
+      message.push(prompts.storyPrompt3);
+    } else if (req.session.count == 4) {
+      message.push(prompts.system)
+      for (let i = 0; i < promptsArray.length; i++) {
+        message.push({ role: "assistant", content: promptsArray[i] });
+        message.push({ role: "user", content: answersArray[i] });
+      }
+      message.push(prompts.conclusionPrompt);
     } else {
-      res.redirect("/initialRecommend");
-    }
-
-    let content = await gpt(message);
-
-    if (!content) {
       return res.redirect("/initialRecommend");
     }
 
-    options = content.split(/#\d+\s+/).filter((option) => option !== "");
-    let attempts = 0;
-    while (options.length < 4 && attempts < 5) {
-      let content = await gpt(message);
-      options = content.split(/#\d+\s+/).filter((option) => option !== "");
-      attempts++;
-      console.log("attempts:", attempts);
-      console.log(options)
+    let content;
+    let splitContent;
+    console.log("message:", message)
+    try {
+      content = await gpt(message);
+    } catch (err) {
+      console.log('could not get content');
+      // Display alert and redirect
+      return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
+    }
+
+    if (req.session.count < 4) {
+      try {
+        splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+        let attempts = 0;
+        while (splitContent.length < 3 && attempts < 5) {
+          try {
+            content = await gpt(message);
+          } catch (err) {
+            console.log('could not get content');
+            return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
+          }
+          try {
+            splitContent = content.split(/#\d+\s+/).filter((option) => option !== "");
+          } catch (err) {
+            console.log('could not split content');
+            return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
+          }
+        }
+      } catch (err) {
+        console.log('could not split content');
+        return res.send('<script>alert("There is an error connecting to the server. Please try again later. Redirecting to welcome screen."); window.location.href = "/initialRecommend";</script>');
+      }
+      console.log("splitContent:", splitContent)
+    } else {
+      if (content.includes('.')) {
+        let middleIndex = Math.floor(content.length / 2);
+        let closestPeriodIndex = content.indexOf('.', middleIndex);
+        let paragraph1 = content.substring(0, closestPeriodIndex + 1);
+        let paragraph2 = content.substring(closestPeriodIndex + 1);
+        splitContent = [paragraph1, paragraph2];
+      } else {
+        splitContent = [content]
+      }
     }
 
     await userCollection.updateOne(
       { email: email },
-      { $push: { promptsArray: options[0] } }
+      { $push: { promptsArray: splitContent[0] } }
     );
     res.render("promptScreen", {
-      options: options,
+      sessionCount: req.session.count,
+      splitContent: splitContent,
       count: req.session.count,
-      stylesheetPath: ["./styles/promptScreen.css", ],
+      stylesheetPath: ["./styles/promptScreen.css",],
     });
   }
 );
 
+
 app.get("/optionProcess", userAuthenticator, async (req, res) => {
   const email = req.session.email;
   const answer = req.query.answer;
+  req.session.genre = req.query.genre - 1;
   await userCollection.updateOne(
     { email: email },
     { $push: { answersArray: answer } }

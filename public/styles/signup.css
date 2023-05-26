@@ -1,6 +1,7 @@
 body {
     background-color: #292929;
     color: #D6AD60;
+    
 }
 
 .signup-form {
@@ -35,7 +36,7 @@ input[type="date"] {
 }
 
 label {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     display: inline-block;
     text-align: left;
@@ -68,17 +69,25 @@ label {
     color: gray;
 }
 
-button:focus {
-    outline: none;
+.password-requirements,
+#passwordMatchError {
+    font-size: 20px;
+    text-align: left;
 }
 
-@media screen and (max-width: 768px) {
-    .signup-form {
-        margin-bottom: 150px;
+small {
+    font-size: 16px;
+    text-align: left;
+}
+
+@media screen and (max-width: 768px){
+    body {
+        margin-bottom: 200px;
     }
 
-    form {
-        width: 80%;
-        margin: auto;
-    }
+    .password-requirements,
+    #passwordMatchError {
+    font-size: 16px;
+    text-align: left;
+}   
 }

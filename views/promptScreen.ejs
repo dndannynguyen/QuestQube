@@ -1,28 +1,52 @@
-<%- include("templates/head", { stylesheetPath:
-['/styles/promptScreen.css','/styles/nav.css','/styles/foot.css'] }) %> <%-
-include("templates/nav") %>
-<div class="content">
+<%- include("templates/head", { stylesheetPath: ['/styles/promptScreen.css','/styles/nav.css','/styles/foot.css'] }) %>
+  <%- include("templates/nav") %>
+    <div class="content">
       <div class="picture">
-        <% if (count == 1) { %>
+        <% if (count==1) { %>
           <img src="mediaResources/guild.jpg" alt="" />
-        <% } else if (count == 2) { %>
-          <img src="mediaResources/city.jpg" alt="" />
-        <% } %>
+          <% } else if (count==2) { %>
+            <img src="mediaResources/city.jpg" alt="" />
+            <% } else if (count==3) { %>
+              <img src="mediaResources/beast.jpg" alt="" />
+              <% } else if (count==4) { %>
+                <img src="mediaResources/cheer.jpg" alt="" />
+                <% } %>
       </div>
       <div class="prompt-card">
         <div class="prompt">
           <p>
-            <%= options[0] %>
+            <% if (sessionCount < 4) { %>
+              <%= splitContent[0] %>
+            <% } %>
+            <% if (sessionCount >= 4) { %>
+              <%= splitContent[0] %>
+            <% } %>
+          </p>
+          <p>
+            <% if (sessionCount >= 4) { %>
+              <%= splitContent[1] %>
+            <% } %>
           </p>
         </div>
         <div class="prompt-options">
-          <% for (var i = 1; i < options.length; i++) { %>
-            <a href="/optionProcess?answer=<%= encodeURIComponent(options[i]) %>" style="--clr:#fceabb"><span>
-              <%= options[i] %></span><i></i>
-            </a>
-            <br>
-          <% } %>
+          <% if (sessionCount < 4) { %>
+            <% for (var i=1; i < splitContent.length; i++) { %>
+              <a onclick="loader()"
+                href="/optionProcess?answer=<%= encodeURIComponent(splitContent[i]) %>&genre=<%= i %>"
+                style="--clr:#fceabb"><span>
+                  <%= splitContent[i] %>
+                </span><i></i>
+              </a>
+              <br>
+              <% } %>
+                <% } %>
+                  <% if (sessionCount>= 4) { %>
+                    <a onclick="loader()" href="/finalRecommend" style="--clr:#fceabb"><span>
+                        Recommendations</span><i></i>
+                      <% } %>
         </div>
       </div>
     </div>
+    <script src="/scripts/loader.js"></script>
+
     <%- include("templates/foot") %>

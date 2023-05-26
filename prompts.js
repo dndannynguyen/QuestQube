@@ -1,119 +1,139 @@
+const determineKeywords = (genre) => {
+  const keywords = {
+    0: ["Pistol", "Tactical Knife", "Grappling Hook", "Explosives", "Rope", "Night Vision Goggles", "First Aid Kit", "Multi-tool", "Smoke Grenades", "Portable Surveillance Equipment"],
+    1: ["Sword", "Bow and Arrows", "Staff", "Shield", "Potion", "Lockpick", "Magic Scroll", "Armor", "Map", "Quest Journal"],
+    2: ["Chessboard", "Strategy Guide", "Codebreaker", "Logic Puzzle", "Planning Notebook", "Map", "Calculator", "Mind Teaser", "Cipher Wheel", "Strategy Board Game"],
+    3: ["VR headset", "bouquet of roses", "Augmented reality glasses", "virtual pet dinosaur", "digital alarm clock"],
+    4: ["basketball", "soccer ball", "super car", "foot ball", "vintage sports car", "tennis racket", "golf club", "fishing rod", "baseball bat"]
+  };
+  let keywordsList = [];
+  let usedKeywords = []; // Array to keep track of used keywords
 
-// const determineKeywords = (genre) => {
-//   const keywords = {
-//     action: ["sword", "laser gun", "nunchuks", "power gauntlet", "kill", "war"],
-//     adventure: ["treasure map", "pith helmet", "signpost", "stars", "platinum compass"],
-//     strategy: ["battle planning map", "puzzle cube", "war", "blueprint", "puzzle"],
-//     simulation: ["king", "bouquet of roses", "war", "hammer", "farm"],
-//     sportsracing: ["basketball", "soccer", "cars", "marathon", "hockey"]
-//   };
-  
-//   let ranNum = Math.floor(Math.random() * 5);
+  for (let i = 0; i < 5; i++) {
+    let randomIndex;
+    let keyword;
 
-//   if (genre === "action") {
-//     let keyword = keywords.action[ranNum];
-//   } else if (genre === "adventure") {
-//     let keyword = keywords.adventure[ranNum];
-//   } else if (genre === "strategy") {
-//     let keyword = keywords.strategy[ranNum];
-//   } else if (genre === "simulation") {
-//     let keyword = keywords.simulation[ranNum];
-//   } else if (genre === "sportsracing") {
-//     let keyword = keywords.sportsracing[ranNum];
-//   }
-  
-//   return keyword;
-// };
+    do {
+      randomIndex = Math.floor(Math.random() * keywords[genre].length);
+      keyword = keywords[genre][randomIndex];
+    } while (usedKeywords.includes(keyword)); // Keep selecting a random keyword until it hasn't been used
+
+    keywordsList.push(keyword);
+    usedKeywords.push(keyword);
+  }
+
+  return keywordsList;
+};
 
 
-const systemMessage1 = [
-  {
+system = {
     role: "system",
     content: `
-    I want to create a choose your own adventure game where we give prompts to the user to determine what kind of games they like. At the end of the game we recommend a game that they may like based on their answers to the prompts.
+    You are an interactive narrative story teller. You will generate a story prompt for the user followed by 5 choices that the user can choose from. You will be given a set of rules and context to follow for each section of the story. After you have generated 3 story prompts along with their choices, you will conclude the story.
 
     Rules:
-    The prompts need to be phrased so that the user is going through a journey.
-    Keep the word count below 150.
-    You must give 4 options after each story prompt.
-    Options must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
-    
-    Prompt 1 Context:
-    The initial prompt should be that you are at an adventurers guild looking for a quest. The answers should be in the form of 5 people in the guild that you want to follow. The answers should pertain to these 5 genres: action, adventure, strategy, simulation, sports/racing.
-    
-    What is the first prompt?
+    The story prompt must be written in second person ("you" perspective).
+    Phrase the story prompts as if the user is going on a journey/adventure.
+    The story prompts must be between less than 100 words.
+    You must give 5 choices after each story prompt. no more, no less.
+    Each choice must be between 7 to 12 words and be a single sentence.
+    Choices must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
     `,
-  },
-];
+}
 
-const systemMessage2 = [
-  {
-    role: "system",
-    content: `
-    I want to create a choose your own adventure game where we give prompts to the user to determine what kind of games they like. At the end of the game we recommend a game that they may like based on their answers to the prompts.
+storyPrompt1 = {
+  role: "system",
+  content: `
+    Story Prompt 1 Context:
+    The user will arrive at an adventurers guild in search of a thrilling quest. There are five individuals at the guild each of whom relates to/represents these five video game genres in this exact order: action, adventure, real time strategy, simulation, sports/racing. The choices you give to the user must pertain to these 5 people. Describe these people and their professions in detail. The people must be interesting and have a unique traits. The user will follow/meet/learn about the person they choose. Do not mention video games or genres in the story or the choices.
 
-    Rules:
-    The prompts need to be phrased so that the user is going through a journey.
-    Keep the word count below 150.
-    You must give 4 options after each story prompt.
-    Options must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
-    
-    Prompt 2 Context:
-    The second prompt should be that the user has followed their person of choice to this location: city. Continue the story, placing the user into an interesting scenario.
-    
-    What is the second prompt?
+    Keywords to help you describe the people:
+    action: Fearless, Tenacious, Charismatic, Resourceful, Loyal, Muscular, Athletic, Tall, Agile, Striking
+    adventure: Adventurous, Brave, Curious, Daring, Resilient, Fit, Agile, Energetic, Strong, Nimble
+    real time strategy: Intelligent, Analytical, Logical, Strategic, Tactical, Calculating, Cunning, Clever, Quick-witted, Observant
+    simulation: Creative, Imaginative, Artistic, Inventive, Innovative, Original, Unique, Eccentric, Quirky, Unconventional
+    sports/racing: Competitive, Athletic, Energetic, Fit, Agile, Strong, Fast, Quick, Nimble, Determined
+
+    Desired format:
+    The story prompt goes here.
+    #1 Choice 1
+    #2 Choice 2
+    #3 Choice 3
+    #4 Choice 4
+    #5 Choice 5
     `,
-  },
-];
+}
 
-// const systemMessage3 = [
-//   {
-//     role: "system",
-//     content: `
-//     I want to create a choose your own adventure game where we give prompts to the user to determine what kind of games they like. At the end of the game we recommend a game that they may like based on their answers to the prompts.
+storyPrompt2 = {
+  role: "system",
+  content: `
+  Story Prompt 2 Context:
+  The user has followed the person they chose from the previous prompt. The person they chose is now taking them on a journey/adventure in one of the following location: City. The user and the person they chose run into a problem that they must solve together. The choices you give to the user must pertain to the problem they are trying to solve. The problem and choices must have a direct connection to the theme/genre/profession of the person they chose. The problem must be interesting and have choices relevant to the person they originally chose. Do not mention video games or genres in the story or the choices.
 
-//     Rules:
-//     The prompts need to be phrased so that the user is going through a journey.
-//     Keep the word count below 150.
-//     You must give 4 options after each story prompt.
-//     The options must include these 4 keywords: ${keyword1}, ${keyword2}, ${keyword3}, ${keyword4}.
-//     Options must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
-    
-//     Prompt 3 Context:
-//     The third prompt should continue the story. Continue the story, placing the user into an interesting scenario.
-    
-//     What is the second prompt?
-//     `,
-//   },
-// ];
+  Desired format:
+  The story prompt goes here.
+  #1 Choice 1
+  #2 Choice 2
+  #3 Choice 3
+  #4 Choice 4
+  #5 Choice 5
+  `,
+}
 
-const systemMessage3 = [
-  {
-    role: "system",
-    content: `
-    I want 10 recommendations based on the prompts and answers that I like.
+storyPrompt3 = {
+  role: "system",
+  content: `
+  Story Prompt 3 Context:
+  The user has picked a choice from the previous prompt. There is a new problem that the user must solve. The choices you give to the user must pertain to the problem. The problem must be interesting and have unique choices.
 
-    Rules:
-    Do not continue the story in your response.
-    Final recommendations must be in the numbering format: '#1 ', '#2 ', '#3 ', etc.
-    Do not include any dialogue before or after the recommendations.
-    Keep the word count below 150.
-    You must give 10 recommendations.
-    The recommendations must be relevant to the users previous responses.
-    Only show the game titles, not the game description.
-    
-    Final recommendation Context:
-    Please recommend 10 games that the user may like based on their previous responses.
-    
-    What are the 10 games that you recommend?
-    `,
-  },
-];
+  Desired format:
+  The story prompt goes here.
+  #1 Choice 1
+  #2 Choice 2
+  #3 Choice 3
+  #4 Choice 4
+  #5 Choice 5
+  `,
+}
+
+conclusionPrompt = {
+  role: "system",
+  content: `
+  Conclusion Prompt Context:
+  Use the previous choices and prompts to conclude the story. The conclusion must be interesting and have a unique, happy ending. The conclusion must be less than 75 words. Do not give any choices to the user.
+
+  Desired format:
+  Conclusion goes here.
+  `,
+}
+
+recommendPrompt = {
+  role: "system",
+  content: `
+  Recommendation Prompt Context:
+  Recommend 10 games to the user based on the choices they made. The recommendations must be relevant to the choices they made and the story they experienced.
+
+  Desired format:
+  #1 Game 1
+  #2 Game 2
+  #3 Game 3
+  #4 Game 4
+  #5 Game 5
+  #6 Game 6
+  #7 Game 7
+  #8 Game 8
+  #9 Game 9
+  #10 Game 10
+  `,
+}
+
 
 module.exports = {
-  // determineKeywords,
-  systemMessage1,
-  systemMessage2,
-  systemMessage3,
-  // systemMessage4,
+  determineKeywords,
+  system,
+  storyPrompt1,
+  storyPrompt2,
+  storyPrompt3,
+  conclusionPrompt,
+  recommendPrompt
 };

@@ -1,49 +1,57 @@
-<%- include("templates/head", { stylesheetPath:
-['/styles/signup.css','/styles/nav.css','/styles/foot.css'] }) %> <%- include("templates/nav") %>
+<%- include("templates/head", { stylesheetPath: ['/styles/signup.css','/styles/nav.css','/styles/foot.css'] }) %>
+<%- include("templates/nav") %>
 <div class="signup-form">
   <h1>Sign up</h1>
   <br />
   <form action="/signupSubmit" method="post">
     <label for="username">Username</label>
-    <input name="username" type="text" placeholder="username" />
+    <input name="username" type="text" maxlength="24" placeholder="username" required/>
     <br />
     <br />
     <label for="name">Name</label>
-    <input name="name" type="text" placeholder="name" />
+    <input name="name" type="text" maxlength="24" placeholder="name" required/>
     <br />
     <br />
     <label for="email">Email</label>
-    <input name="email" type="email" placeholder="email" />
+    <input name="email" type="email" maxlength="24" placeholder="email" required pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"/>
     <br />
     <br />
     <label for="password">Password <br> <p style="font-size:x-small;">(*Must be at least 8 characters long with at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.)</p></label>
-    <input name="password" type="password" placeholder="password" />
+    <input type="password" name="password" maxlength="129" id="password" placeholder="password" required/>
+    <div id="passwordRequirements" class="password-requirements"></div>
     <br />
     <br />
-    <label for="dob">Date of Birth</label>
-    <input name="dob" type="date" placeholder="DOB" />
+    <label for="account-confirm-pass">Confirm Password</label>
+    <input class="form-control" type="password" maxlength="129" name="confirmPassword" id="confirmPassword" placeholder="confirm password" required/>
+    <small id="passwordMatchError" style="color: red; display: none;">Passwords do not match.</small>
+    <br />
+    <label for="dob">Date of Birth <span class="required-text">*</span></label>
+    <input name="dob" type="date" placeholder="DOB" required/>
     <br />
     <br />
     
-      <label for="securityQuestion">Security Question?</label>
-      <select name="security_question" id="dropdown">
-        <option value="Where was your mother born?">
-          Where was your mother born?
-        </option>
-        <option value="What was your first car?">
-          What was your first car?
-        </option>
-        <option value="What was the first name of your first pet?">
-          What was the first name of your first pet?
-        </option>
-        <option value="What was your school name?">
-          What was your school name?
-        </option>
-        <option value="Where were you born?">Where were you born?</option>
-        <option value="What model your first smartphone was?">
-          What model your first smartphone was?
-        </option>
-      </select>
+    <label for="securityQuestion">Security Question? <span class="required-text">*</span></label>
+    <select name="security_question" id="dropdown" required>
+      <option value="" disabled selected>
+        Select your security question
+      </option>
+      <option value="Where was your mother born?">
+        What model was your first smartphone?
+      </option>
+      <option value="What was your first car?">
+        What was the first name of your first pet?
+      </option>
+      <option value="What was the first name of your first pet?">
+        What was your first car?
+      </option>
+      <option value="What was your school name?">
+        What was your school name?
+      </option>
+      <option value="Where were you born?">Where were you born?</option>
+      <option value="What model your first smartphone was?">
+        Where was your mother born?
+      </option>
+    </select>
     <br><br>
     
       <label for="secQuestAnswer">Type your security question here</label>
@@ -51,11 +59,128 @@
         type="text"
         class="form-control"
         name="security_answer"
+        maxlength="24" 
         placeholder="Answer here"
+        required
       />
    <br>
-    <button class="btn btn-success"><b>Submit</b></button>
+    <button id="Submit" class="btn btn-success"><b>Submit</b></button>
   </form>
 </div>
+<script>
+  // Function to check if passwords match and enable/disable the button
+  function checkPasswordMatch() {
+    var password = document.getElementById("password");
+    var confirmPassword = document.getElementById("confirmPassword");
+    var passwordMatchError = document.getElementById("passwordMatchError");
+    var updateProfileButton = document.getElementById("Submit");
+    var passwordRequirements = document.getElementById("passwordRequirements");
+  
+    // Regular expressions for each password requirement
+    var uppercaseRegex = /[A-Z]/;
+    var lowercaseRegex = /[a-z]/;
+    var numberRegex = /[0-9]/;
+    var specialCharRegex = /[!@#$%^&*]/;
+    var minLength = 8;
+  
+    // Check each requirement and display the corresponding icon
+    var checkmarks = [];
+    var crosses = [];
+    if (uppercaseRegex.test(password.value)) {
+      checkmarks.push("Uppercase letter");
+    } else {
+      crosses.push("Uppercase letter");
+    }
+    if (lowercaseRegex.test(password.value)) {
+      checkmarks.push("Lowercase letter");
+    } else {
+      crosses.push("Lowercase letter");
+    }
+    if (numberRegex.test(password.value)) {
+      checkmarks.push("Number");
+    } else {
+      crosses.push("Number");
+    }
+    if (specialCharRegex.test(password.value)) {
+      checkmarks.push("Special character");
+    } else {
+      crosses.push("Special character");
+    }
+    if (password.value.length >= minLength) {
+      checkmarks.push("Minimum " + minLength + " characters");
+    } else {
+      crosses.push("Minimum " + minLength + " characters");
+    }
+  
+    // Update the password requirements text with checkmarks and crosses
+    var requirementsText = "";
+    if (checkmarks.length > 0 || crosses.length > 0) {
+      requirementsText += "<ul>";
+      checkmarks.forEach(function (requirement) {
+        requirementsText += "<li>&#10003; " + requirement + "</li>";
+      });
+      crosses.forEach(function (requirement) {
+        requirementsText += "<li style='color: red;'>&#10005; " + requirement + "</li>";
+      });
+      requirementsText += "</ul>";
+    }
+    passwordRequirements.innerHTML = requirementsText;
+  
+    // Check if passwords match and enable/disable the button
+    if (password.value !== "" || confirmPassword.value !== "") {
+      if (password.value !== confirmPassword.value) {
+        passwordMatchError.style.display = "block";
+        updateProfileButton.disabled = true;
+      } else if (crosses.length > 0) {
+        passwordMatchError.style.display = "none";
+        updateProfileButton.disabled = true;
+      } else {
+        passwordMatchError.style.display = "none";
+        updateProfileButton.disabled = false;
+      }
+    } else {
+      passwordMatchError.style.display = "none";
+      updateProfileButton.disabled = false;
+    }
+  }
+  
+  // Event listener for password inputs
+  var passwordInputs = document.querySelectorAll("input[type='password']");
+  passwordInputs.forEach(function (input) {
+    input.addEventListener("input", checkPasswordMatch);
+  });
+  
+  // Show password requirements pop-up on input field click
+  var passwordInput = document.getElementById("password");
+  var confirmPasswordInput = document.getElementById("confirmPassword");
+  var passwordMatchError = document.getElementById("passwordMatchError");
+  
+  passwordInput.addEventListener("input", function () {
+    passwordRequirements.style.display = "block";
+  });
+  
+  passwordInput.addEventListener("blur", function () {
+    if (passwordInput.value === "") {
+      passwordRequirements.style.display = "none";
+    }
+  });
+  
+  confirmPasswordInput.addEventListener("blur", function () {
+    if (passwordInput.value !== confirmPasswordInput.value) {
+      passwordMatchError.style.display = "block";
+    } else {
+      passwordMatchError.style.display = "none";
+    }
+  });
+  
+  // Call the function when the page loads
+  window.addEventListener("load", function () {
+    checkPasswordMatch();
+    passwordRequirements.style.display = "none";
+    passwordMatchError.style.display = "none";
+  });
+  
+  </script>
+  
 
 <%- include("templates/foot") %>

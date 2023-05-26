@@ -60,7 +60,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 20px
+    gap: 20px;
 }
 
 .game-info {
@@ -68,7 +68,7 @@ body {
     flex-direction: row;
     border: 1px solid #FBDC6A;
     border-radius: 10px;
-
+    width: 100%;
 
 }
 
@@ -90,6 +90,7 @@ body {
     border-radius: 10px;
     transition: 0.5s;
     margin-bottom: 10px;
+    width: 100%;
 }
 
 .options a:hover {
@@ -184,6 +185,8 @@ body {
 
     .options a {
         font-size: 1.5em;
+        display: flex;
+        width: 100%;
     }
 
     .game-info img {
