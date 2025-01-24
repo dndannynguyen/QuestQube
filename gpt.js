@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 const openai = axios.create({
-  baseURL: "https://api.openai.com/v1",
+  baseURL: "https://models.inference.ai.azure.com",
   headers: {
     "Content-Type": "application/json",
     Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -11,7 +11,7 @@ const openai = axios.create({
 const createChatCompletion = async (messages, options = {}) => {
   try {
     const response = await openai.post("/chat/completions", {
-      model: options.model || "gpt-3.5-turbo",
+      model: options.model || "gpt-4o-mini",
       messages,
       ...options,
     });
@@ -24,7 +24,7 @@ const createChatCompletion = async (messages, options = {}) => {
 
 const gpt = async (message) => {
   const options = {
-    temperature: 0.7,
+    temperature: 1.0,
     max_tokens: 250,
   };
 

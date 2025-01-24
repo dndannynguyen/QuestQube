@@ -17,9 +17,7 @@ include("templates/nav") %>
       class="game-info <%= (i >= 3) ? 'hidden-card' : '' %>"
       id="game-card-<%= i %>"
       <%
-      if(i
-    >
-      = 3) { %>style="display: none;"<% } %>>
+      if(i >= 3) { %>style="display: none;"<% } %>>
       <div class="picture">
         <img id="game-image-<%= i %>" src="" alt="" />
       </div>
