@@ -13,7 +13,7 @@ async function main() {
   );
   console.log("Connected to MongoDB");
 
-  app.listen(process.env.PORT || 8080, () => {
+  app.listen(process.env.PORT || 3000, () => {
     console.log("Listening to port...");
   });
 }
