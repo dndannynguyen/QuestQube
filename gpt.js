@@ -11,7 +11,7 @@ const openai = axios.create({
 const createChatCompletion = async (messages, options = {}) => {
   try {
     const response = await openai.post("/chat/completions", {
-      model: options.model || "gpt-4o-mini",
+      model: options.model || "gpt-4o",
       messages,
       ...options,
     });
