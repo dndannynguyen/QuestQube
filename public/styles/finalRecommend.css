@@ -96,7 +96,6 @@ body {
 .options a:hover {
     background: var(--clr);
     color: var(--clr);
-    letter-spacing: 0.12em;
     box-shadow: 0 0 35px var(--clr);
 }
 
